@@ -1,4 +1,3 @@
-
 const vehicle_db = [
 	{
 		id: 'V2001',
@@ -42,4 +41,39 @@ const vehicle_db = [
 	}
 ];
 
-export { student_db, vehicle_db };
+const customer_db = [
+	{
+		id: 'C1001',
+		firstName: 'Kasun',
+		lastName: 'Perera',
+		email: 'kasun.perera@example.com',
+		phone: '+94 77 123 4567',
+		address: 'No. 12, Galle Road, Colombo'
+	},
+	{
+		id: 'C1002',
+		firstName: 'Nimali',
+		lastName: 'Silva',
+		email: 'nimali.silva@example.com',
+		phone: '+94 71 998 7744',
+		address: 'No. 45, Kandy Road, Kurunegala'
+	},
+	{
+		id: 'C1003',
+		firstName: 'Ravindu',
+		lastName: 'Fernando',
+		email: 'ravindu.fernando@example.com',
+		phone: '+94 76 245 3344',
+		address: 'No. 8, Temple Street, Gampaha'
+	},
+	{
+		id: 'C1004',
+		firstName: 'Tharushi',
+		lastName: 'Jayasena',
+		email: 'tharushi.jayasena@example.com',
+		phone: '+94 75 886 1122',
+		address: 'No. 22, Main Street, Matara'
+	}
+];
+
+export { vehicle_db, customer_db };

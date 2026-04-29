@@ -1,66 +1,180 @@
-function renderCust(data) {
-	data = data || state.customers;
-	const tb = $('custTbl');
-	if (!data.length) {
-		tb.innerHTML = '<tr class="empty-row"><td colspan="4">No customers found. Add your first customer!</td></tr>';
+import {
+  check_email,
+  check_phone_number
+} from "../util/regex_util.js";
+import {
+  addCustomerData,
+  updateCustomerData,
+  deleteCustomerData,
+  getAllCustomerData,
+  getCustomerDataByIndex,
+  getCustomerDataById
+} from "../model/customerModel.js";
+
+const customerScope = $('#customerSection').length ? '#customerSection ' : '';
+const customerResetButton = $('#customerSection').length ? '#customer_btnReset' : '#btnReset';
+
+let selected_index = -1;
+
+const clearForm = () => {
+	$(customerResetButton).click();
+	selected_index = -1;
+}
+
+const loadCustomerTbl = () => {
+
+	$('#custTbl').empty();
+
+	getAllCustomerData().map(item => {
+		let data = `${item.id},${item.firstName},${item.lastName},${item.email},${item.phone},${item.address}`;
+		let new_row = `<tr data-index="${data}"> <td>${item.id}</td> <td>${item.firstName} ${item.lastName}</td> <td>${item.email}</td> <td>${item.phone}</td> <td>${item.address}</td> </tr>`;
+		$('#custTbl').append(new_row);
+	});
+
+}
+
+$('#custTbl').on('click', 'tr', function() {
+
+	const index = $(this).index();
+	selected_index = index;
+	const customer_obj = getCustomerDataByIndex(index);
+
+	if (!customer_obj) {
 		return;
 	}
-	tb.innerHTML = data.map(c => `
-		<tr onclick="selectCust('${c.id}')">
-			<td><span class="badge badge-gold">${c.id}</span></td>
-			<td style="font-weight:600">${c.firstName} ${c.lastName}</td>
-			<td style="color:var(--teal)">${c.email || '-'}</td>
-			<td>${c.phone || '-'}</td>
-		</tr>`).join('');
-}
 
-function saveCust() {
-	const fn = $('cFn').value.trim(), ln = $('cLn').value.trim();
-	if (!fn || !ln) { showMsg('Please enter first and last name.', 'error'); return; }
-	state.customers.push({
-		id: uid('C'),
-		firstName: fn, lastName: ln,
-		email: $('cEm').value.trim(),
-		phone: $('cPh').value.trim(),
-		address: $('cAd').value.trim()
-	});
-	saveState(); renderCust(); showMsg('Customer saved successfully!'); clearCust();
-}
+	$('#cId').val(customer_obj.id);
+	$('#cFn').val(customer_obj.firstName);
+	$('#cLn').val(customer_obj.lastName);
+	$('#cEm').val(customer_obj.email);
+	$('#cPh').val(customer_obj.phone);
+	$('#cAd').val(customer_obj.address);
+});
 
-function selectCust(id) {
-	const c = state.customers.find(x => x.id === id);
-	if (!c) return;
-	$('cId').value = c.id; $('cFn').value = c.firstName; $('cLn').value = c.lastName;
-	$('cEm').value = c.email || ''; $('cPh').value = c.phone || ''; $('cAd').value = c.address || '';
-}
+$(`${customerScope}.btn-save`).on('click', function () {
 
-function updateCust() {
-	const id = $('cId').value;
-	if (!id) { showMsg('Please select a customer to update.', 'error'); return; }
-	const i = state.customers.findIndex(x => x.id === id);
-	if (i < 0) return;
-	state.customers[i] = { ...state.customers[i],
-		firstName: $('cFn').value.trim(), lastName: $('cLn').value.trim(),
-		email: $('cEm').value.trim(), phone: $('cPh').value.trim(), address: $('cAd').value.trim()
-	};
-	saveState(); renderCust(); showMsg('Customer updated!', 'info'); clearCust();
-}
+	const customerId = $('#cId').val();
+	const customerFirstName = $('#cFn').val();
+	const customerLastName = $('#cLn').val();
+	const customerEmail = $('#cEm').val();
+	const customerPhone = $('#cPh').val();
+	const customerAddress = $('#cAd').val();
 
-function deleteCust() {
-	const id = $('cId').value;
-	if (!id) { showMsg('Please select a customer to delete.', 'error'); return; }
-	if (!confirm('Delete this customer?')) return;
-	state.customers = state.customers.filter(x => x.id !== id);
-	saveState(); renderCust(); showMsg('Customer deleted.', 'error'); clearCust();
-}
+	if (customerId == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "ID is required!" });
+		return;
+	}
+	if (getCustomerDataById(customerId)) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "ID already exists!" });
+		return;
+	}
+	if (customerFirstName == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "First name is required!" });
+		return;
+	}
+	if (customerLastName == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Last name is required!" });
+		return;
+	}
+	if (customerEmail == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Email is required!" });
+		return;
+	}
+	if (customerPhone == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Phone number is required!" });
+		return;
+	}
+	if (!check_email(customerEmail)) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Invalid email address!" });
+		return;
+	}
+	if (!check_phone_number(customerPhone)) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Invalid phone number!" });
+		return;
+	}
+	if (customerAddress == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Address is required!" });
+		return;
+	}
 
-function clearCust() {
-	['cId','cFn','cLn','cEm','cPh','cAd'].forEach(f => $(f).value = '');
-}
+	addCustomerData(customerId, customerFirstName, customerLastName, customerEmail, customerPhone, customerAddress);
+	loadCustomerTbl();
+	Swal.fire({ position: "justify-center", icon: "success", title: "Customer Added Successfully!", showConfirmButton: false, timer: 1500 });
+	clearForm();
+});
 
-function filterCust() {
-	const q = $('cSearch').value.toLowerCase();
-	renderCust(state.customers.filter(c => (c.firstName+' '+c.lastName).toLowerCase().includes(q)));
-}
+$(`${customerScope}.btn-update`).on('click', function () {
 
-renderCust();
+	if (selected_index === -1) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Please select a customer first!" });
+		return;
+	}
+
+	const customerId = $('#cId').val();
+	const customerFirstName = $('#cFn').val();
+	const customerLastName = $('#cLn').val();
+	const customerEmail = $('#cEm').val();
+	const customerPhone = $('#cPh').val();
+	const customerAddress = $('#cAd').val();
+
+	const currentCustomer = getCustomerDataByIndex(selected_index);
+
+	if (customerId == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "ID is required!" });
+		return;
+	}
+	if (customerId !== currentCustomer.id) {
+		if (getCustomerDataById(customerId)) {
+			Swal.fire({ icon: "error", title: "Oops...", text: "ID already exists!" });
+			return;
+		}
+	}
+	if (customerFirstName == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "First name is required!" });
+		return;
+	}
+	if (customerLastName == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Last name is required!" });
+		return;
+	}
+	if (customerEmail == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Email is required!" });
+		return;
+	}
+	if (customerPhone == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Phone number is required!" });
+		return;
+	}
+	if (!check_email(customerEmail)) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Invalid email address!" });
+		return;
+	}
+	if (!check_phone_number(customerPhone)) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Invalid phone number!" });
+		return;
+	}
+	if (customerAddress == "") {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Address is required!" });
+		return;
+	}
+
+	updateCustomerData(selected_index, customerId, customerFirstName, customerLastName, customerEmail, customerPhone, customerAddress);
+	loadCustomerTbl();
+	Swal.fire({ position: "justify-center", icon: "success", title: "Customer updated successfully!", showConfirmButton: false, timer: 1500 });
+	clearForm();
+});
+
+$(`${customerScope}.btn-delete`).on('click', function () {
+
+	if (selected_index === -1) {
+		Swal.fire({ icon: "error", title: "Oops...", text: "Please select a customer first!" });
+		return;
+	}
+
+	deleteCustomerData(selected_index);
+	loadCustomerTbl();
+	Swal.fire({ position: "justify-center", icon: "success", title: "Customer Deleted Successfully!", showConfirmButton: false, timer: 1500 });
+	clearForm();
+});
+
+loadCustomerTbl();
