@@ -1,4 +1,7 @@
-let users = [];
+// ============================================================
+// LOGIN
+// ============================================================
+let selected_index = -1;
 
 function switchTab(t) {
 	$('tabLogin').className = 'auth-tab' + (t==='login' ? ' active' : '');
@@ -13,13 +16,11 @@ function doLogin() {
 	const email = $('lEmail').value.trim();
 	const pass  = $('lPass').value;
 	if (!email || !pass) { showAuthErr('lErr', 'Please fill in all fields'); return; }
-	if (email === 'oshan@gmail.com' && pass === '1234') {
+	if (getLoginDataByEmail(email) && getLoginDataByEmail(email).password === pass) {
 		showApp();
 		return;
 	}
-	const user = users.find(u => u.email === email && u.password === pass);
-	if (!user) { showAuthErr('lErr', 'Invalid email or password'); return; }
-	showApp();
+	showAuthErr('lErr', 'Invalid email or password');
 }
 
 function doRegister() {
@@ -29,15 +30,14 @@ function doRegister() {
 	const pass2 = $('rPass2').value;
 	if (!name || !email || !pass || !pass2) { showAuthErr('rErr','Please fill in all fields'); return; }
 	if (pass !== pass2) { showAuthErr('rErr','Passwords do not match'); return; }
-	if (users.find(u => u.email === email)) { showAuthErr('rErr','Email already registered'); return; }
-	users.push({ id: uid('U'), username: name, email, password: pass });
+	if (getLoginDataByEmail(email)) { showAuthErr('rErr','Email already registered'); return; }
+	addLoginData(uid('U'), name, email, pass);
 	showMsg('Registration successful! Please login.', 'success');
 	switchTab('login');
 	$('rUser').value = $('rEmail').value = $('rPass').value = $('rPass2').value = '';
 }
 
 function doLogout() {
-	users = [];
 	$('mainApp').className = 'hidden';
 	$('authSection').className = '';
 	$('lEmail').value = ''; $('lPass').value = '';
