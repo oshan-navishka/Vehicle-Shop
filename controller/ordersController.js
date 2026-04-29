@@ -1,7 +1,22 @@
-// ============================================================
-// ORDER
-// ============================================================
+import {
+  addOrderData,
+  updateOrderData,
+  deleteOrderData,
+  getAllOrderData,
+  getOrderDataByIndex,
+  getOrderDataById
+} from "../model/ordersModel.js";
+
+const orderScope = $('#orderSection').length ? '#orderSection ' : '';
+const orderResetButton = $('#orderSection').length ? '#order_btnReset' : '#btnReset';
+
+let currentOrderItems = [];
+let selected_index = -1;
+
 function initOrder() {
+  if (typeof state !== 'undefined') {
+    state.orders = getAllOrderData();
+  }
   $('oId').value = uid('ORD');
   $('oDate').value = new Date().toISOString().split('T')[0];
   populateOrderSelects();
@@ -37,7 +52,6 @@ function addToOrder() {
   const qty = parseInt($('oQty').value) || 1;
   if (qty < 1) { showMsg('Quantity must be at least 1.', 'error'); return; }
 
-  // Check total already ordered + new qty
   const ex = currentOrderItems.find(x => x.id === vid);
   const alreadyOrdered = ex ? ex.qty : 0;
   if (alreadyOrdered + qty > v.qty) {
@@ -104,29 +118,23 @@ function placeOrder() {
   const cash = parseFloat($('oCash').value) || 0;
   const bal = parseFloat(($('oBal').value || '0').replace(/[^\d.-]/g, '')) || 0;
 
-  const order = {
-    orderId: $('oId').value,
-    date: $('oDate').value,
-    custId: $('oCust').value,
-    custName: $('oCustName').value,
-    items: [...currentOrderItems],
-    total: net,
-    discount: disc,
-    cash,
-    balance: bal
-  };
+  const orderId = $('oId').value;
+  const date = $('oDate').value;
+  const custId = $('oCust').value;
+  const custName = $('oCustName').value;
+  const items = [...currentOrderItems];
 
-  // Deduct stock
+  const order = addOrderData(orderId, date, custId, custName, items, net, disc, cash, bal);
+
   order.items.forEach(item => {
     const i = state.vehicles.findIndex(v => v.id === item.id);
     if (i >= 0) state.vehicles[i].qty -= item.qty;
   });
 
-  state.orders.push(order);
+  state.orders = getAllOrderData();
   saveState();
   showMsg('✅ Order placed successfully!');
 
-  // Reset order form
   currentOrderItems = [];
   renderOrderItems();
   $('oId').value = uid('ORD');
@@ -137,12 +145,8 @@ function placeOrder() {
   populateOrderSelects();
 }
 
-
-// ============================================================
-// ORDER HISTORY
-// ============================================================
 function renderHist(data) {
-  data = data || state.orders;
+  data = data || getAllOrderData();
   const tb = $('histTbl');
   if (!data.length) {
     tb.innerHTML = '<tr class="empty-row"><td colspan="9">No orders yet. Place your first order!</td></tr>';
@@ -164,9 +168,21 @@ function renderHist(data) {
 
 function filterHist() {
   const q = $('hSearch').value.toLowerCase();
-  renderHist(state.orders.filter(o =>
+  renderHist(getAllOrderData().filter(o =>
     o.orderId.toLowerCase().includes(q) ||
     o.custId.toLowerCase().includes(q) ||
     (o.custName || '').toLowerCase().includes(q)
   ));
 }
+
+window.initOrder = initOrder;
+window.populateOrderSelects = populateOrderSelects;
+window.fillCustInfo = fillCustInfo;
+window.fillVehInfo = fillVehInfo;
+window.addToOrder = addToOrder;
+window.removeOrderItem = removeOrderItem;
+window.renderOrderItems = renderOrderItems;
+window.calcBalance = calcBalance;
+window.placeOrder = placeOrder;
+window.renderHist = renderHist;
+window.filterHist = filterHist;

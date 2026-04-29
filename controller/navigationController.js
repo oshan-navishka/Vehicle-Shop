@@ -1,8 +1,10 @@
 // ============================================================
 // NAVIGATION
 // ============================================================
+const navPages = ['dash', 'cust', 'veh', 'ord', 'hist'];
+
 function nav(page) {
-  ['dash','cust','veh','ord','hist'].forEach(p => {
+  navPages.forEach(p => {
     $('s_' + p).className = 'section-wrap' + (p !== page ? ' hidden' : '');
     $('n_' + p).className = 'nav-link' + (p === page ? ' active' : '');
   });
@@ -12,3 +14,5 @@ function nav(page) {
   if (page === 'cust') renderCust();
   if (page === 'veh')  renderVeh();
 }
+
+window.nav = nav;
