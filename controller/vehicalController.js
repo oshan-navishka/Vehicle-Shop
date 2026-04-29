@@ -1,77 +1,184 @@
-// ============================================================
-// VEHICLES
-// ============================================================
-function renderVeh(data) {
-  data = data || state.vehicles;
-  const tb = $('vehTbl');
-  if (!data.length) {
-    tb.innerHTML = '<tr class="empty-row"><td colspan="7">No vehicles in stock. Add your first vehicle!</td></tr>';
+import {
+  addVehicleData,
+  updateVehicleData,
+  deleteVehicleData,
+  getAllVehicleData,
+  getVehicleDataByIndex,
+  getVehicleDataById
+} from "../model/vehicalModel.js";
+
+const vehicleScope = $('#vehicleSection').length ? '#vehicleSection ' : '';
+const vehicleResetButton = $('#vehicleSection').length ? '#vehicle_btnReset' : '#btnReset';
+
+let selected_index = -1;
+
+const clearForm = () => {
+  $('#vId').val('');
+  $('#vMake').val('');
+  $('#vModel').val('');
+  $('#vYear').val('');
+  $('#vColor').val('');
+  $('#vQty').val('');
+  $('#vPrice').val('');
+  $('#vDesc').val('');
+  $(vehicleResetButton).click();
+  selected_index = -1;
+};
+
+const loadVehicleTbl = () => {
+  $('#vehTbl').empty();
+
+  getAllVehicleData().map(item => {
+    let data = `${item.id},${item.make},${item.model},${item.year},${item.color},${item.qty},${item.price},${item.desc}`;
+    let new_row = `<tr data-index="${data}"> <td>${item.id}</td> <td>${item.make}</td> <td>${item.model}</td> <td>${item.year}</td> <td>${item.color}</td> <td>${item.qty}</td> <td>${item.price}</td> </tr>`;
+    $('#vehTbl').append(new_row);
+  });
+};
+
+$('#vehTbl').on('click', 'tr', function() {
+  const index = $(this).index();
+  selected_index = index;
+  const vehicle_obj = getVehicleDataByIndex(index);
+
+  if (!vehicle_obj) {
     return;
   }
-  tb.innerHTML = data.map(v => `
-    <tr onclick="selectVeh('${v.id}')">
-      <td><span class="badge badge-blue">${v.id}</span></td>
-      <td style="font-weight:700">${v.make}</td>
-      <td>${v.model}</td>
-      <td>${v.year || '-'}</td>
-      <td>${v.color || '-'}</td>
-      <td><span class="badge ${v.qty > 0 ? 'badge-green' : 'badge-red'}">${v.qty}</span></td>
-      <td style="font-weight:700;color:#06d6a0">Rs. ${Number(v.price).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-    </tr>`).join('');
-}
 
-function saveVeh() {
-  const mk = $('vMake').value.trim(), mo = $('vModel').value.trim();
-  if (!mk || !mo) { showMsg('Please enter make and model.', 'error'); return; }
-  state.vehicles.push({
-    id: uid('V'), make: mk, model: mo,
-    year: $('vYear').value || '',
-    color: $('vColor').value.trim(),
-    qty: parseInt($('vQty').value) || 1,
-    price: parseFloat($('vPrice').value) || 0,
-    desc: $('vDesc').value.trim()
-  });
-  saveState(); renderVeh(); showMsg('Vehicle added to inventory!'); clearVeh();
-}
+  $('#vId').val(vehicle_obj.id);
+  $('#vMake').val(vehicle_obj.make);
+  $('#vModel').val(vehicle_obj.model);
+  $('#vYear').val(vehicle_obj.year);
+  $('#vColor').val(vehicle_obj.color);
+  $('#vQty').val(vehicle_obj.qty);
+  $('#vPrice').val(vehicle_obj.price);
+  $('#vDesc').val(vehicle_obj.desc);
+});
 
-function selectVeh(id) {
-  const v = state.vehicles.find(x => x.id === id);
-  if (!v) return;
-  $('vId').value = v.id; $('vMake').value = v.make; $('vModel').value = v.model;
-  $('vYear').value = v.year || ''; $('vColor').value = v.color || '';
-  $('vQty').value = v.qty; $('vPrice').value = v.price; $('vDesc').value = v.desc || '';
-}
+$(`${vehicleScope}.btn-save`).on('click', function () {
+  const vehicleId = $('#vId').val();
+  const vehicleMake = $('#vMake').val();
+  const vehicleModel = $('#vModel').val();
+  const vehicleYear = $('#vYear').val();
+  const vehicleColor = $('#vColor').val();
+  const vehicleQty = $('#vQty').val();
+  const vehiclePrice = $('#vPrice').val();
+  const vehicleDesc = $('#vDesc').val();
 
-function updateVeh() {
-  const id = $('vId').value;
-  if (!id) { showMsg('Please select a vehicle to update.', 'error'); return; }
-  const i = state.vehicles.findIndex(x => x.id === id);
-  if (i < 0) return;
-  state.vehicles[i] = { ...state.vehicles[i],
-    make: $('vMake').value.trim(), model: $('vModel').value.trim(),
-    year: $('vYear').value, color: $('vColor').value.trim(),
-    qty: parseInt($('vQty').value) || 0,
-    price: parseFloat($('vPrice').value) || 0,
-    desc: $('vDesc').value.trim()
-  };
-  saveState(); renderVeh(); showMsg('Vehicle updated!', 'info'); clearVeh();
-}
+  if (vehicleId == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'ID is required!' });
+    return;
+  }
+  if (getVehicleDataById(vehicleId)) {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'ID already exists!' });
+    return;
+  }
+  if (vehicleMake == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Make is required!' });
+    return;
+  }
+  if (vehicleModel == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Model is required!' });
+    return;
+  }
+  if (vehicleYear == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Year is required!' });
+    return;
+  }
+  if (vehicleColor == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Color is required!' });
+    return;
+  }
+  if (vehicleQty == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Quantity is required!' });
+    return;
+  }
+  if (vehiclePrice == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Price is required!' });
+    return;
+  }
+  if (vehicleDesc == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Description is required!' });
+    return;
+  }
 
-function deleteVeh() {
-  const id = $('vId').value;
-  if (!id) { showMsg('Please select a vehicle to delete.', 'error'); return; }
-  if (!confirm('Remove this vehicle from inventory?')) return;
-  state.vehicles = state.vehicles.filter(x => x.id !== id);
-  saveState(); renderVeh(); showMsg('Vehicle removed.', 'error'); clearVeh();
-}
+  addVehicleData(vehicleId, vehicleMake, vehicleModel, vehicleYear, vehicleColor, vehicleQty, vehiclePrice, vehicleDesc);
+  loadVehicleTbl();
+  Swal.fire({ position: 'justify-center', icon: 'success', title: 'Vehicle Added Successfully!', showConfirmButton: false, timer: 1500 });
+  clearForm();
+});
 
-function clearVeh() {
-  ['vId','vMake','vModel','vYear','vColor','vQty','vPrice','vDesc'].forEach(f => $(f).value = '');
-}
+$(`${vehicleScope}.btn-update`).on('click', function () {
+  if (selected_index === -1) {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Please select a vehicle first!' });
+    return;
+  }
 
-function filterVeh() {
-  const q = $('vSearch').value.toLowerCase();
-  renderVeh(state.vehicles.filter(v => (v.make+' '+v.model).toLowerCase().includes(q)));
-}
+  const vehicleId = $('#vId').val();
+  const vehicleMake = $('#vMake').val();
+  const vehicleModel = $('#vModel').val();
+  const vehicleYear = $('#vYear').val();
+  const vehicleColor = $('#vColor').val();
+  const vehicleQty = $('#vQty').val();
+  const vehiclePrice = $('#vPrice').val();
+  const vehicleDesc = $('#vDesc').val();
 
-renderVeh();
+  const currentVehicle = getVehicleDataByIndex(selected_index);
+
+  if (vehicleId == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'ID is required!' });
+    return;
+  }
+  if (vehicleId !== currentVehicle.id) {
+    if (getVehicleDataById(vehicleId)) {
+      Swal.fire({ icon: 'error', title: 'Oops...', text: 'ID already exists!' });
+      return;
+    }
+  }
+  if (vehicleMake == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Make is required!' });
+    return;
+  }
+  if (vehicleModel == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Model is required!' });
+    return;
+  }
+  if (vehicleYear == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Year is required!' });
+    return;
+  }
+  if (vehicleColor == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Color is required!' });
+    return;
+  }
+  if (vehicleQty == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Quantity is required!' });
+    return;
+  }
+  if (vehiclePrice == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Price is required!' });
+    return;
+  }
+  if (vehicleDesc == '') {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Description is required!' });
+    return;
+  }
+
+  updateVehicleData(selected_index, vehicleId, vehicleMake, vehicleModel, vehicleYear, vehicleColor, vehicleQty, vehiclePrice, vehicleDesc);
+  loadVehicleTbl();
+  Swal.fire({ position: 'justify-center', icon: 'success', title: 'Vehicle updated successfully!', showConfirmButton: false, timer: 1500 });
+  clearForm();
+});
+
+$(`${vehicleScope}.btn-delete`).on('click', function () {
+  if (selected_index === -1) {
+    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Please select a vehicle first!' });
+    return;
+  }
+
+  deleteVehicleData(selected_index);
+  loadVehicleTbl();
+  Swal.fire({ position: 'justify-center', icon: 'success', title: 'Vehicle Deleted Successfully!', showConfirmButton: false, timer: 1500 });
+  clearForm();
+});
+
+loadVehicleTbl();
