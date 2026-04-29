@@ -1,24 +1,18 @@
-// ============================================================
-// DASHBOARD
-// ============================================================
+import { customer_db, vehicle_db, order_db } from '../db/db.js';
+
 function updateDash() {
-    // db arrays directly use කරනවා - state sync ගැටළු නැහැ
-    const customers = typeof window.customer_db !== 'undefined' ? window.customer_db : (state.customers || []);
-    const vehicles  = typeof window.vehicle_db  !== 'undefined' ? window.vehicle_db  : (state.vehicles  || []);
-    const orders    = typeof window.order_db    !== 'undefined' ? window.order_db    : (state.orders    || []);
+    document.getElementById('dc_cust').textContent = customer_db.length;
+    document.getElementById('dc_veh').textContent  = vehicle_db.length;
+    document.getElementById('dc_ord').textContent  = order_db.length;
 
-    document.getElementById('dc_cust').textContent = customers.length;
-    document.getElementById('dc_veh').textContent  = vehicles.length;
-    document.getElementById('dc_ord').textContent  = orders.length;
-
-    const rev = orders.reduce((s, o) => s + (o.total || 0), 0);
+    const rev = order_db.reduce((s, o) => s + (Number(o.total) || 0), 0);
     document.getElementById('dc_rev').textContent = 'Rs. ' + rev.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
 
-    const tb = document.getElementById('recentOrdTbl');
-    const recent = orders.slice(-8).reverse();
+    const tb     = document.getElementById('recentOrdTbl');
+    const recent = order_db.slice(-8).reverse();
 
     if (!recent.length) {
         tb.innerHTML = '<tr class="empty-row"><td colspan="5">No orders yet — create your first sale!</td></tr>';
