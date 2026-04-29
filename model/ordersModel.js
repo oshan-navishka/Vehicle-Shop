@@ -1,3 +1,5 @@
+import { order_db } from "../db/db.js";
+
 class Order {
 	#orderId;
 	#date;
@@ -42,42 +44,6 @@ class Order {
 	set balance(newBalance) { this.#balance = newBalance; }
 }
 
-const order_db = [
-	new Order(
-		'ORD3001',
-		'2026-04-25',
-		'C1001',
-		'Kasun Perera',
-		[{ id: 'V2002', name: 'Honda Civic 2021', price: 27450, qty: 1, total: 27450 }],
-		26901,
-		2,
-		28000,
-		1099
-	),
-	new Order(
-		'ORD3002',
-		'2026-04-27',
-		'C1003',
-		'Ravindu Fernando',
-		[{ id: 'V2004', name: 'Suzuki Swift 2023', price: 21400, qty: 1, total: 21400 }],
-		21400,
-		0,
-		22000,
-		600
-	),
-	new Order(
-		'ORD3003',
-		'2026-04-28',
-		'C1002',
-		'Nimali Silva',
-		[{ id: 'V2001', name: 'Toyota Corolla 2022', price: 28900, qty: 1, total: 28900 }],
-		28322,
-		2,
-		29000,
-		678
-	)
-];
-
 const addOrderData = (orderId, date, custId, custName, items, total, discount, cash, balance) => {
 	let new_order = new Order(orderId, date, custId, custName, items, total, discount, cash, balance);
 
@@ -120,4 +86,6 @@ const getOrderDataByIndex = (index) => {
 const getOrderDataById = (orderId) => {
 	return order_db.find(item => item.orderId === orderId);
 };
+
+export { addOrderData, updateOrderData, deleteOrderData, getOrderData, getAllOrderData, getOrderDataByIndex, getOrderDataById };
 
