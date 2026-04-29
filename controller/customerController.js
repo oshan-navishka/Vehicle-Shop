@@ -1,5 +1,13 @@
 import { check_email, check_phone_number } from "../util/regex_util.js";
-import { addCustomerData, updateCustomerData, deleteCustomerData, getAllCustomerData, getCustomerDataByIndex, getCustomerDataById } from "../model/customerModel.js";
+import { 
+    addCustomerData, 
+    updateCustomerData, 
+    deleteCustomerData, 
+    getAllCustomerData, 
+    getCustomerDataByIndex, 
+    getCustomerDataById 
+} from "../model/customerModel.js";
+import { customer_db } from "../db/db.js";
 
 let selected_index = -1;
 
@@ -40,14 +48,14 @@ $('#custTbl').on('click', 'tr', function() {
 });
 
 window.saveCust = function() {
-    const customerId    = $('#cId').val().trim();
+    const customerId        = $('#cId').val().trim();
     const customerFirstName = $('#cFn').val().trim();
     const customerLastName  = $('#cLn').val().trim();
-    const customerEmail = $('#cEm').val().trim();
-    const customerPhone = $('#cPh').val().trim();
-    const customerAddress = $('#cAd').val().trim();
+    const customerEmail     = $('#cEm').val().trim();
+    const customerPhone     = $('#cPh').val().trim();
+    const customerAddress   = $('#cAd').val().trim();
 
-    if (!customerId)       { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
+    if (!customerId)        { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
     if (getCustomerDataById(customerId)) { Swal.fire({ icon:'error', title:'Oops...', text:'ID already exists!' }); return; }
     if (!customerFirstName) { Swal.fire({ icon:'error', title:'Oops...', text:'First name is required!' }); return; }
     if (!customerLastName)  { Swal.fire({ icon:'error', title:'Oops...', text:'Last name is required!' }); return; }
@@ -66,15 +74,15 @@ window.saveCust = function() {
 window.updateCust = function() {
     if (selected_index === -1) { Swal.fire({ icon:'error', title:'Oops...', text:'Please select a customer first!' }); return; }
 
-    const customerId    = $('#cId').val().trim();
+    const customerId        = $('#cId').val().trim();
     const customerFirstName = $('#cFn').val().trim();
     const customerLastName  = $('#cLn').val().trim();
-    const customerEmail = $('#cEm').val().trim();
-    const customerPhone = $('#cPh').val().trim();
-    const customerAddress = $('#cAd').val().trim();
-    const currentCustomer = getCustomerDataByIndex(selected_index);
+    const customerEmail     = $('#cEm').val().trim();
+    const customerPhone     = $('#cPh').val().trim();
+    const customerAddress   = $('#cAd').val().trim();
+    const currentCustomer   = getCustomerDataByIndex(selected_index);
 
-    if (!customerId) { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
+    if (!customerId)        { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
     if (customerId !== currentCustomer.id && getCustomerDataById(customerId)) { Swal.fire({ icon:'error', title:'Oops...', text:'ID already exists!' }); return; }
     if (!customerFirstName) { Swal.fire({ icon:'error', title:'Oops...', text:'First name is required!' }); return; }
     if (!customerLastName)  { Swal.fire({ icon:'error', title:'Oops...', text:'Last name is required!' }); return; }
@@ -98,7 +106,20 @@ window.deleteCust = function() {
     clearForm();
 };
 
-window.clearCust = clearForm;
+window.filterCust = function() {
+    const query = $('#cSearch').val().toLowerCase();
+    $('#custTbl tr').each(function() {
+        const name = $(this).find('td:eq(1)').text().toLowerCase();
+        const id   = $(this).find('td:eq(0)').text().toLowerCase();
+        $(this).toggle(name.includes(query) || id.includes(query));
+    });
+};
+
+window.clearCust  = clearForm;
 window.renderCust = loadCustomerTbl;
+
+// state + window sync
+window.customer_db = customer_db;
+state.customers    = customer_db;
 
 loadCustomerTbl();

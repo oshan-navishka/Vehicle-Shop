@@ -1,4 +1,4 @@
-const users_db = [];
+import { users_db } from '../db/db.js';
 
 function uid(prefix) {
     return prefix + Date.now().toString(36).toUpperCase().slice(-6);
@@ -13,8 +13,8 @@ function getLoginDataByEmail(email) {
 }
 
 function switchTab(t) {
-    document.getElementById('tabLogin').className = 'auth-tab' + (t === 'login' ? ' active' : '');
-    document.getElementById('tabReg').className   = 'auth-tab' + (t === 'reg'   ? ' active' : '');
+    document.getElementById('tabLogin').className  = 'auth-tab' + (t === 'login' ? ' active' : '');
+    document.getElementById('tabReg').className    = 'auth-tab' + (t === 'reg'   ? ' active' : '');
     document.getElementById('loginPane').className = t === 'login' ? '' : 'hidden';
     document.getElementById('regPane').className   = t === 'reg'   ? '' : 'hidden';
     document.getElementById('lErr').classList.add('hidden');
@@ -39,22 +39,22 @@ function doRegister() {
     const pass  = document.getElementById('rPass').value;
     const pass2 = document.getElementById('rPass2').value;
     if (!name || !email || !pass || !pass2) { showAuthErr('rErr', 'Please fill in all fields'); return; }
-    if (pass !== pass2) { showAuthErr('rErr', 'Passwords do not match'); return; }
+    if (pass !== pass2)             { showAuthErr('rErr', 'Passwords do not match'); return; }
     if (getLoginDataByEmail(email)) { showAuthErr('rErr', 'Email already registered'); return; }
     addLoginData(uid('U'), name, email, pass);
     showMsg('Registration successful! Please login.', 'success');
     switchTab('login');
-    document.getElementById('rUser').value = '';
+    document.getElementById('rUser').value  = '';
     document.getElementById('rEmail').value = '';
-    document.getElementById('rPass').value = '';
+    document.getElementById('rPass').value  = '';
     document.getElementById('rPass2').value = '';
 }
 
 function doLogout() {
-    document.getElementById('mainApp').className = 'hidden';
+    document.getElementById('mainApp').className     = 'hidden';
     document.getElementById('authSection').className = '';
-    document.getElementById('lEmail').value = '';
-    document.getElementById('lPass').value = '';
+    document.getElementById('lEmail').value          = '';
+    document.getElementById('lPass').value           = '';
     document.getElementById('lErr').classList.add('hidden');
     document.getElementById('rErr').classList.add('hidden');
     switchTab('login');
@@ -69,6 +69,12 @@ function showAuthErr(id, msg) {
 
 function showApp() {
     document.getElementById('authSection').className = 'hidden';
-    document.getElementById('mainApp').className = '';
+    document.getElementById('mainApp').className     = '';
     nav('dash');
 }
+
+// window expose - module script නිසා global functions expose කරන්න ඕනේ
+window.switchTab  = switchTab;
+window.doLogin    = doLogin;
+window.doRegister = doRegister;
+window.doLogout   = doLogout;

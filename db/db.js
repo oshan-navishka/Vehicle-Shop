@@ -18,5 +18,7 @@ export const order_db = [
     { orderId: 'ORD3003', date: '2026-04-28', custId: 'C1002', custName: 'Nimali Silva', items: [{ id: 'V2001', name: 'Toyota Corolla 2022', price: 28900, qty: 1, total: 28900 }], total: 28322, discount: 2, cash: 29000, balance: 678 }
 ];
 
-export const users = [];
+export const users_db = [
+    { id: 'U001', name: 'Oshan Navishka', email: 'oshan@gmail.com', password: '1234' }
+];
 export const currentOrderItems = [];
