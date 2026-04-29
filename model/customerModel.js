@@ -1,5 +1,6 @@
 import { customer_db } from "../db/db.js";
 
+// ---------------- CLASS ----------------
 class Customer {
     #id;
     #firstName;
@@ -17,63 +18,89 @@ class Customer {
         this.#address = address;
     }
 
-    get id()        { return this.#id; }
+    get id() { return this.#id; }
     get firstName() { return this.#firstName; }
-    get lastName()  { return this.#lastName; }
-    get email()     { return this.#email; }
-    get phone()     { return this.#phone; }
-    get address()   { return this.#address; }
+    get lastName() { return this.#lastName; }
+    get email() { return this.#email; }
+    get phone() { return this.#phone; }
+    get address() { return this.#address; }
 
-    set id(v)        { this.#id = v; }
+    set id(v) { this.#id = v; }
     set firstName(v) { this.#firstName = v; }
-    set lastName(v)  { this.#lastName = v; }
-    set email(v)     { this.#email = v; }
-    set phone(v)     { this.#phone = v; }
-    set address(v)   { this.#address = v; }
+    set lastName(v) { this.#lastName = v; }
+    set email(v) { this.#email = v; }
+    set phone(v) { this.#phone = v; }
+    set address(v) { this.#address = v; }
 }
 
-// ---- Convert seed plain objects to Customer instances ----
+// ---------------- SYNC STORAGE ----------------
+function syncCustomers() {
+    localStorage.setItem("pos_customers", JSON.stringify(customer_db));
+}
+
+// ---------------- SEED FIX ----------------
 for (let i = 0; i < customer_db.length; i++) {
     const d = customer_db[i];
+
     if (!(d instanceof Customer)) {
-        customer_db[i] = new Customer(d.id, d.firstName, d.lastName, d.email, d.phone, d.address);
+        customer_db[i] = new Customer(
+            d.id,
+            d.firstName,
+            d.lastName,
+            d.email,
+            d.phone,
+            d.address
+        );
     }
 }
 
-// ---- Add ----
-const addCustomerData = (customerId, firstName, lastName, email, phone, address) => {
-    const c = new Customer(customerId, firstName, lastName, email, phone, address);
+// ---------------- ADD ----------------
+const addCustomerData = (id, firstName, lastName, email, phone, address) => {
+
+    const c = new Customer(id, firstName, lastName, email, phone, address);
+
     customer_db.push(c);
+
+    syncCustomers(); // 🔥 FIX
+
     return c;
 };
 
-// ---- Update ----
-const updateCustomerData = (index, customerId, firstName, lastName, email, phone, address) => {
+// ---------------- UPDATE (SAFE FIX) ----------------
+const updateCustomerData = (index, id, firstName, lastName, email, phone, address) => {
+
     const c = customer_db[index];
-    c.id        = customerId;
+    if (!c) return null;
+
+    c.id = id;
     c.firstName = firstName;
-    c.lastName  = lastName;
-    c.email     = email;
-    c.phone     = phone;
-    c.address   = address;
+    c.lastName = lastName;
+    c.email = email;
+    c.phone = phone;
+    c.address = address;
+
+    syncCustomers(); // 🔥 FIX
+
     return c;
 };
 
-// ---- Delete ----
+// ---------------- DELETE ----------------
 const deleteCustomerData = (index) => {
     customer_db.splice(index, 1);
-    return true;
+    syncCustomers(); // 🔥 FIX
 };
 
-// ---- Get All ----
+// ---------------- GET ALL ----------------
 const getAllCustomerData = () => customer_db;
 
-// ---- Get By Index ----
+// ---------------- GET BY INDEX ----------------
 const getCustomerDataByIndex = (index) => customer_db[index];
 
-// ---- Get By Id ----
-const getCustomerDataById = (customerId) => customer_db.find(c => c.id === customerId);
+// ---------------- GET BY ID ----------------
+const getCustomerDataById = (id) =>
+    customer_db.find(c => c.id === id);
 
+// ---------------- EXPORT ----------------
 export {
     addCustomerData,
     updateCustomerData,

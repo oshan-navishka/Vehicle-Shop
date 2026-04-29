@@ -1,16 +1,18 @@
 import { check_email, check_phone_number } from "../util/regex_util.js";
-import { 
-    addCustomerData, 
-    updateCustomerData, 
-    deleteCustomerData, 
-    getAllCustomerData, 
-    getCustomerDataByIndex, 
-    getCustomerDataById 
+import {
+    addCustomerData,
+    updateCustomerData,
+    deleteCustomerData,
+    getAllCustomerData,
+    getCustomerDataByIndex,
+    getCustomerDataById
 } from "../model/customerModel.js";
+
 import { customer_db } from "../db/db.js";
 
 let selected_index = -1;
 
+/* ---------------- CLEAR FORM ---------------- */
 const clearForm = () => {
     $('#cId').val('');
     $('#cFn').val('');
@@ -19,114 +21,189 @@ const clearForm = () => {
     $('#cPh').val('');
     $('#cAd').val('');
     selected_index = -1;
+
+    $('#custTbl tr').removeClass('table-active'); // highlight remove
 };
 
+/* ---------------- LOAD TABLE ---------------- */
 const loadCustomerTbl = () => {
-    $('#custTbl').empty();
-    getAllCustomerData().forEach(item => {
-        let new_row = `<tr>
-            <td>${item.id}</td>
-            <td>${item.firstName} ${item.lastName}</td>
-            <td>${item.email}</td>
-            <td>${item.phone}</td>
-        </tr>`;
-        $('#custTbl').append(new_row);
+    const tbl = $('#custTbl');
+    tbl.empty();
+
+    getAllCustomerData().forEach((item, index) => {
+        let row = `
+            <tr data-index="${index}">
+                <td>${item.id}</td>
+                <td>${item.firstName} ${item.lastName}</td>
+                <td>${item.email}</td>
+                <td>${item.phone}</td>
+            </tr>
+        `;
+        tbl.append(row);
     });
 };
 
-$('#custTbl').on('click', 'tr', function() {
-    const index = $(this).index();
+/* ---------------- SELECT ROW (FIXED) ---------------- */
+$('#custTbl').on('click', 'tr', function () {
+    const index = $(this).data('index');
     selected_index = index;
-    const customer_obj = getCustomerDataByIndex(index);
-    if (!customer_obj) return;
-    $('#cId').val(customer_obj.id);
-    $('#cFn').val(customer_obj.firstName);
-    $('#cLn').val(customer_obj.lastName);
-    $('#cEm').val(customer_obj.email);
-    $('#cPh').val(customer_obj.phone);
-    $('#cAd').val(customer_obj.address);
+
+    $('#custTbl tr').removeClass('table-active');
+    $(this).addClass('table-active');
+
+    const customer = getCustomerDataByIndex(index);
+    if (!customer) return;
+
+    $('#cId').val(customer.id);
+    $('#cFn').val(customer.firstName);
+    $('#cLn').val(customer.lastName);
+    $('#cEm').val(customer.email);
+    $('#cPh').val(customer.phone);
+    $('#cAd').val(customer.address);
 });
 
-window.saveCust = function() {
-    // Auto-generate ID if field is empty or disabled
+/* ---------------- SAVE ---------------- */
+window.saveCust = function () {
+
     let customerId = $('#cId').val().trim();
+
     if (!customerId) {
-        const ids = getAllCustomerData().map(c => parseInt(c.id.replace(/\D/g, '')) || 0);
-        const maxId = ids.length > 0 ? Math.max(...ids) : 1000;
+        const ids = getAllCustomerData()
+            .map(c => parseInt(c.id.replace(/\D/g, '')) || 0);
+
+        const maxId = ids.length ? Math.max(...ids) : 1000;
         customerId = 'C' + (maxId + 1);
         $('#cId').val(customerId);
     }
 
-    const customerFirstName = $('#cFn').val().trim();
-    const customerLastName  = $('#cLn').val().trim();
-    const customerEmail     = $('#cEm').val().trim();
-    const customerPhone     = $('#cPh').val().trim();
-    const customerAddress   = $('#cAd').val().trim();
+    const firstName = $('#cFn').val().trim();
+    const lastName  = $('#cLn').val().trim();
+    const email     = $('#cEm').val().trim();
+    const phone     = $('#cPh').val().trim();
+    const address   = $('#cAd').val().trim();
 
-    if (getCustomerDataById(customerId)) { Swal.fire({ icon:'error', title:'Oops...', text:'ID already exists!' }); return; }
-    if (!customerFirstName) { Swal.fire({ icon:'error', title:'Oops...', text:'First name is required!' }); return; }
-    if (!customerLastName)  { Swal.fire({ icon:'error', title:'Oops...', text:'Last name is required!' }); return; }
-    if (!customerEmail)     { Swal.fire({ icon:'error', title:'Oops...', text:'Email is required!' }); return; }
-    if (!check_email(customerEmail)) { Swal.fire({ icon:'error', title:'Oops...', text:'Invalid email!' }); return; }
-    if (!customerPhone)     { Swal.fire({ icon:'error', title:'Oops...', text:'Phone is required!' }); return; }
-    if (!check_phone_number(customerPhone)) { Swal.fire({ icon:'error', title:'Oops...', text:'Invalid phone number!' }); return; }
-    if (!customerAddress)   { Swal.fire({ icon:'error', title:'Oops...', text:'Address is required!' }); return; }
+    if (getCustomerDataById(customerId)) {
+        Swal.fire('Error', 'ID already exists!', 'error');
+        return;
+    }
 
-    addCustomerData(customerId, customerFirstName, customerLastName, customerEmail, customerPhone, customerAddress);
+    if (!firstName || !lastName || !email || !phone || !address) {
+        Swal.fire('Error', 'All fields are required!', 'error');
+        return;
+    }
+
+    if (!check_email(email)) {
+        Swal.fire('Error', 'Invalid email!', 'error');
+        return;
+    }
+
+    if (!check_phone_number(phone)) {
+        Swal.fire('Error', 'Invalid phone number!', 'error');
+        return;
+    }
+
+    addCustomerData(customerId, firstName, lastName, email, phone, address);
+
     loadCustomerTbl();
-    Swal.fire({ icon:'success', title:'Customer Added!', showConfirmButton:false, timer:1500 });
     clearForm();
-};
 
-window.updateCust = function() {
-    if (selected_index === -1) { Swal.fire({ icon:'error', title:'Oops...', text:'Please select a customer first!' }); return; }
-
-    const customerId        = $('#cId').val().trim();
-    const customerFirstName = $('#cFn').val().trim();
-    const customerLastName  = $('#cLn').val().trim();
-    const customerEmail     = $('#cEm').val().trim();
-    const customerPhone     = $('#cPh').val().trim();
-    const customerAddress   = $('#cAd').val().trim();
-    const currentCustomer   = getCustomerDataByIndex(selected_index);
-
-    if (!customerId)        { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
-    if (customerId !== currentCustomer.id && getCustomerDataById(customerId)) { Swal.fire({ icon:'error', title:'Oops...', text:'ID already exists!' }); return; }
-    if (!customerFirstName) { Swal.fire({ icon:'error', title:'Oops...', text:'First name is required!' }); return; }
-    if (!customerLastName)  { Swal.fire({ icon:'error', title:'Oops...', text:'Last name is required!' }); return; }
-    if (!customerEmail)     { Swal.fire({ icon:'error', title:'Oops...', text:'Email is required!' }); return; }
-    if (!check_email(customerEmail)) { Swal.fire({ icon:'error', title:'Oops...', text:'Invalid email!' }); return; }
-    if (!customerPhone)     { Swal.fire({ icon:'error', title:'Oops...', text:'Phone is required!' }); return; }
-    if (!check_phone_number(customerPhone)) { Swal.fire({ icon:'error', title:'Oops...', text:'Invalid phone number!' }); return; }
-    if (!customerAddress)   { Swal.fire({ icon:'error', title:'Oops...', text:'Address is required!' }); return; }
-
-    updateCustomerData(selected_index, customerId, customerFirstName, customerLastName, customerEmail, customerPhone, customerAddress);
-    loadCustomerTbl();
-    Swal.fire({ icon:'success', title:'Customer Updated!', showConfirmButton:false, timer:1500 });
-    clearForm();
-};
-
-window.deleteCust = function() {
-    if (selected_index === -1) { Swal.fire({ icon:'error', title:'Oops...', text:'Please select a customer first!' }); return; }
-    deleteCustomerData(selected_index);
-    loadCustomerTbl();
-    Swal.fire({ icon:'success', title:'Customer Deleted!', showConfirmButton:false, timer:1500 });
-    clearForm();
-};
-
-window.filterCust = function() {
-    const query = $('#cSearch').val().toLowerCase();
-    $('#custTbl tr').each(function() {
-        const name = $(this).find('td:eq(1)').text().toLowerCase();
-        const id   = $(this).find('td:eq(0)').text().toLowerCase();
-        $(this).toggle(name.includes(query) || id.includes(query));
+    Swal.fire({
+        icon: 'success',
+        title: 'Customer Added!',
+        timer: 1200,
+        showConfirmButton: false
     });
 };
 
+/* ---------------- UPDATE ---------------- */
+window.updateCust = function () {
+
+    if (selected_index === -1) {
+        Swal.fire('Error', 'Select a customer first!', 'error');
+        return;
+    }
+
+    const current = getCustomerDataByIndex(selected_index);
+
+    const customerId = $('#cId').val().trim();
+    const firstName  = $('#cFn').val().trim();
+    const lastName   = $('#cLn').val().trim();
+    const email      = $('#cEm').val().trim();
+    const phone      = $('#cPh').val().trim();
+    const address    = $('#cAd').val().trim();
+
+    if (customerId !== current.id && getCustomerDataById(customerId)) {
+        Swal.fire('Error', 'ID already exists!', 'error');
+        return;
+    }
+
+    if (!firstName || !lastName || !email || !phone || !address) {
+        Swal.fire('Error', 'All fields are required!', 'error');
+        return;
+    }
+
+    updateCustomerData(
+        selected_index,
+        customerId,
+        firstName,
+        lastName,
+        email,
+        phone,
+        address
+    );
+
+    loadCustomerTbl();
+    clearForm();
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Customer Updated!',
+        timer: 1200,
+        showConfirmButton: false
+    });
+};
+
+/* ---------------- DELETE ---------------- */
+window.deleteCust = function () {
+
+    if (selected_index === -1) {
+        Swal.fire('Error', 'Select a customer first!', 'error');
+        return;
+    }
+
+    deleteCustomerData(selected_index);
+
+    loadCustomerTbl();
+    clearForm();
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Customer Deleted!',
+        timer: 1200,
+        showConfirmButton: false
+    });
+};
+
+/* ---------------- SEARCH ---------------- */
+window.filterCust = function () {
+
+    const query = $('#cSearch').val().toLowerCase();
+
+    $('#custTbl tr').each(function () {
+        const text = $(this).text().toLowerCase();
+        $(this).toggle(text.includes(query));
+    });
+};
+
+/* ---------------- EXPORT ---------------- */
 window.clearCust  = clearForm;
 window.renderCust = loadCustomerTbl;
 
-// state + window sync
+/* ---------------- STATE SYNC ---------------- */
 window.customer_db = customer_db;
-state.customers    = customer_db;
+if (window.state) {
+    state.customers = customer_db;
+}
 
+/* ---------------- INIT ---------------- */
 loadCustomerTbl();

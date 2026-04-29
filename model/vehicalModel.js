@@ -1,97 +1,78 @@
 import { vehicle_db } from "../db/db.js";
 
+const STORAGE_KEY = "pos_vehicles";
+
+// ---------- SAVE ----------
+const saveVehicles = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicle_db));
+};
+
+// ---------- CLASS ----------
 class Vehicle {
-    #id;
-    #make;
-    #model;
-    #year;
-    #color;
-    #qty;
-    #price;
-    #desc;
-
     constructor(id, make, model, year, color, qty, price, desc) {
-        this.#id    = id;
-        this.#make  = make;
-        this.#model = model;
-        this.#year  = year;
-        this.#color = color;
-        this.#qty   = qty;
-        this.#price = price;
-        this.#desc  = desc;
-    }
-
-    get id()    { return this.#id; }
-    get make()  { return this.#make; }
-    get model() { return this.#model; }
-    get year()  { return this.#year; }
-    get color() { return this.#color; }
-    get qty()   { return this.#qty; }
-    get price() { return this.#price; }
-    get desc()  { return this.#desc; }
-
-    set id(v)    { this.#id = v; }
-    set make(v)  { this.#make = v; }
-    set model(v) { this.#model = v; }
-    set year(v)  { this.#year = v; }
-    set color(v) { this.#color = v; }
-    set qty(v)   { this.#qty = v; }
-    set price(v) { this.#price = v; }
-    set desc(v)  { this.#desc = v; }
-}
-
-// ---- Convert seed plain objects to Vehicle instances ----
-for (let i = 0; i < vehicle_db.length; i++) {
-    const d = vehicle_db[i];
-    if (!(d instanceof Vehicle)) {
-        vehicle_db[i] = new Vehicle(
-            d.id, d.make, d.model, d.year,
-            d.color, d.qty, d.price, d.desc
-        );
+        this.id = id;
+        this.make = make;
+        this.model = model;
+        this.year = year;
+        this.color = color;
+        this.qty = Number(qty);
+        this.price = Number(price);
+        this.desc = desc;
     }
 }
 
-// ---- Add ----
-const addVehicleData = (vehicleId, make, model, year, color, qty, price, desc) => {
-    const v = new Vehicle(vehicleId, make, model, year, color, qty, price, desc);
+// ---------- LOAD ON START ----------
+const loadVehicles = () => {
+    const data = localStorage.getItem(STORAGE_KEY);
+
+    if (!data) {
+        saveVehicles(); // first time seed save
+        return;
+    }
+
+    const parsed = JSON.parse(data);
+
+    vehicle_db.length = 0;
+    vehicle_db.push(...parsed.map(v =>
+        new Vehicle(v.id, v.make, v.model, v.year, v.color, v.qty, v.price, v.desc)
+    ));
+};
+
+// run once
+loadVehicles();
+
+// ---------- ADD ----------
+export const addVehicleData = (id, make, model, year, color, qty, price, desc) => {
+    const v = new Vehicle(id, make, model, year, color, qty, price, desc);
     vehicle_db.push(v);
+    saveVehicles();
     return v;
 };
 
-// ---- Update ----
-const updateVehicleData = (index, vehicleId, make, model, year, color, qty, price, desc) => {
+// ---------- UPDATE ----------
+export const updateVehicleData = (index, id, make, model, year, color, qty, price, desc) => {
     const v = vehicle_db[index];
-    v.id    = vehicleId;
-    v.make  = make;
+
+    v.id = id;
+    v.make = make;
     v.model = model;
-    v.year  = year;
+    v.year = year;
     v.color = color;
-    v.qty   = qty;
-    v.price = price;
-    v.desc  = desc;
+    v.qty = Number(qty);
+    v.price = Number(price);
+    v.desc = desc;
+
+    saveVehicles();
     return v;
 };
 
-// ---- Delete ----
-const deleteVehicleData = (index) => {
+// ---------- DELETE ----------
+export const deleteVehicleData = (index) => {
     vehicle_db.splice(index, 1);
-    return true;
+    saveVehicles();
 };
 
-// ---- Get All ----
-const getAllVehicleData = () => vehicle_db;
-
-// ---- Get By Index ----
-const getVehicleDataByIndex = (index) => vehicle_db[index];
-
-// ---- Get By Id ----
-const getVehicleDataById = (vehicleId) => vehicle_db.find(v => v.id === vehicleId);
-
-export {
-    addVehicleData,
-    updateVehicleData,
-    deleteVehicleData,
-    getAllVehicleData,
-    getVehicleDataByIndex,
-    getVehicleDataById
-};
+// ---------- GET ----------
+export const getAllVehicleData = () => vehicle_db;
+export const getVehicleDataByIndex = (i) => vehicle_db[i];
+export const getVehicleDataById = (id) => vehicle_db.find(v => v.id === id);

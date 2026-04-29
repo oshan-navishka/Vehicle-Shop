@@ -1,194 +1,220 @@
-import { addOrderData, getAllOrderData } from "../model/ordersModel.js";
-import { customer_db } from "../db/db.js";
-import { vehicle_db } from "../db/db.js";
-import { order_db } from "../db/db.js";
+import { 
+    addOrderData, 
+    getAllOrderData 
+} from "../model/ordersModel.js";
+
+import { customer_db, vehicle_db, order_db } from "../db/db.js";
 
 let currentOrderItems = [];
 
+// helper
 const el = (id) => document.getElementById(id);
 
+// ---------------- INIT ----------------
 function initOrder() {
-    el('oId').value  = uid('ORD');
+    el('oId').value = uid('ORD');
     el('oDate').value = new Date().toISOString().split('T')[0];
+
     populateOrderSelects();
     renderOrderItems();
 }
 
+// ---------------- POPULATE DROPDOWNS ----------------
 function populateOrderSelects() {
-    el('oCust').innerHTML = '<option value="">-- Select Customer --</option>' +
-        customer_db.map(c => `<option value="${c.id}">${c.id} — ${c.firstName} ${c.lastName}</option>`).join('');
+    el('oCust').innerHTML =
+        '<option value="">-- Select Customer --</option>' +
+        customer_db.map(c =>
+            `<option value="${c.id}">${c.id} - ${c.firstName} ${c.lastName}</option>`
+        ).join('');
 
-    el('oVeh').innerHTML = '<option value="">-- Select Vehicle --</option>' +
+    el('oVeh').innerHTML =
+        '<option value="">-- Select Vehicle --</option>' +
         vehicle_db.filter(v => v.qty > 0)
-            .map(v => `<option value="${v.id}">${v.id} — ${v.make} ${v.model} ${v.year || ''} (Stock: ${v.qty})</option>`).join('');
+        .map(v =>
+            `<option value="${v.id}">${v.id} - ${v.make} ${v.model} (Stock:${v.qty})</option>`
+        ).join('');
 }
 
+// ---------------- CUSTOMER INFO ----------------
 function fillCustInfo() {
     const c = customer_db.find(x => x.id === el('oCust').value);
     el('oCustName').value = c ? `${c.firstName} ${c.lastName}` : '';
-    el('oCustAddr').value = c ? (c.address || '') : '';
+    el('oCustAddr').value = c ? c.address : '';
 }
 
+// ---------------- VEHICLE INFO ----------------
 function fillVehInfo() {
     const v = vehicle_db.find(x => x.id === el('oVeh').value);
-    el('oVehName').value  = v ? `${v.make} ${v.model} ${v.year || ''}`.trim() : '';
-    el('oVehPrice').value = v ? `Rs. ${Number(v.price).toFixed(2)}` : '';
+    el('oVehName').value = v ? `${v.make} ${v.model}` : '';
+    el('oVehPrice').value = v ? v.price : '';
     el('oVehStock').value = v ? v.qty : '';
 }
 
+// ---------------- ADD TO ORDER ----------------
 function addToOrder() {
     const vid = el('oVeh').value;
-    if (!vid) { showMsg('Please select a vehicle.', 'error'); return; }
     const v = vehicle_db.find(x => x.id === vid);
-    if (!v) return;
-    const qty = parseInt(el('oQty').value) || 1;
-    if (qty < 1) { showMsg('Quantity must be at least 1.', 'error'); return; }
 
-    const ex = currentOrderItems.find(x => x.id === vid);
-    const alreadyOrdered = ex ? ex.qty : 0;
-    if (alreadyOrdered + qty > v.qty) {
-        showMsg(`Only ${v.qty - alreadyOrdered} more available in stock!`, 'error'); return;
+    if (!v) return;
+
+    const qty = parseInt(el('oQty').value) || 1;
+
+    const existing = currentOrderItems.find(x => x.id === vid);
+    const already = existing ? existing.qty : 0;
+
+    if (already + qty > v.qty) {
+        showMsg("Not enough stock!", "error");
+        return;
     }
 
-    if (ex) {
-        ex.qty  += qty;
-        ex.total = ex.qty * ex.price;
+    if (existing) {
+        existing.qty += qty;
+        existing.total = existing.qty * existing.price;
     } else {
         currentOrderItems.push({
             id: vid,
-            name: `${v.make} ${v.model} ${v.year || ''}`.trim(),
+            name: `${v.make} ${v.model}`,
             price: v.price,
             qty,
-            total: qty * v.price
+            total: v.price * qty
         });
     }
 
     renderOrderItems();
-    el('oVeh').value = ''; el('oQty').value = '';
-    el('oVehName').value = ''; el('oVehPrice').value = ''; el('oVehStock').value = '';
-    showMsg(`${v.make} ${v.model} added to order.`);
 }
 
+// ---------------- RENDER ITEMS ----------------
+function renderOrderItems() {
+    const tb = el('orderItemsTbl');
+
+    if (!currentOrderItems.length) {
+        tb.innerHTML = `<tr><td colspan="6">No items</td></tr>`;
+        el('oTotal').textContent = "Rs. 0.00";
+        return;
+    }
+
+    const total = currentOrderItems.reduce((s, i) => s + i.total, 0);
+    el('oTotal').textContent = "Rs. " + total.toFixed(2);
+
+    tb.innerHTML = currentOrderItems.map(i => `
+        <tr>
+            <td>${i.id}</td>
+            <td>${i.name}</td>
+            <td>${i.price}</td>
+            <td>${i.qty}</td>
+            <td>${i.total}</td>
+            <td><button onclick="removeOrderItem('${i.id}')">X</button></td>
+        </tr>
+    `).join('');
+}
+
+// ---------------- REMOVE ITEM ----------------
 function removeOrderItem(id) {
     currentOrderItems = currentOrderItems.filter(x => x.id !== id);
     renderOrderItems();
 }
 
-function renderOrderItems() {
-    const tot = currentOrderItems.reduce((s, x) => s + x.total, 0);
-    el('oTotal').textContent = 'Rs. ' + tot.toFixed(2);
-    const tb = el('orderItemsTbl');
-    if (!currentOrderItems.length) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="6">No vehicles added yet.</td></tr>';
+// ---------------- CALC ----------------
+function calcBalance() {
+    const total = currentOrderItems.reduce((s, i) => s + i.total, 0);
+    const disc = parseFloat(el('oDisc').value) || 0;
+    const cash = parseFloat(el('oCash').value) || 0;
+
+    const net = total - (total * disc / 100);
+    const bal = cash - net;
+
+    el('oTotal').textContent = "Rs. " + net.toFixed(2);
+    el('oBal').value = bal.toFixed(2);
+}
+
+// ---------------- PLACE ORDER ----------------
+function placeOrder() {
+    if (!el('oCust').value || currentOrderItems.length === 0) {
+        showMsg("Select customer & items", "error");
         return;
     }
-    tb.innerHTML = currentOrderItems.map(x => `
-        <tr>
-            <td><span class="badge badge-blue">${x.id}</span></td>
-            <td style="font-weight:600">${x.name}</td>
-            <td>Rs. ${Number(x.price).toFixed(2)}</td>
-            <td style="font-weight:700">${x.qty}</td>
-            <td style="font-weight:700;color:#06d6a0">Rs. ${Number(x.total).toFixed(2)}</td>
-            <td><button class="btn-remove" onclick="removeOrderItem('${x.id}')">✕ Remove</button></td>
-        </tr>`).join('');
-}
 
-function calcBalance() {
-    const subtotal = currentOrderItems.reduce((s, x) => s + x.total, 0);
-    const disc     = parseFloat(el('oDisc').value) || 0;
-    const net      = subtotal - subtotal * (disc / 100);
-    const cash     = parseFloat(el('oCash').value) || 0;
-    const bal      = cash - net;
-    el('oTotal').textContent = 'Rs. ' + net.toFixed(2);
-    el('oBal').value = 'Rs. ' + bal.toFixed(2);
-    if (bal < 0) showMsg('Insufficient cash! Balance is negative.', 'error');
-    else showMsg('Balance calculated.', 'info');
-}
+    const total = currentOrderItems.reduce((s, i) => s + i.total, 0);
+    const disc = parseFloat(el('oDisc').value) || 0;
+    const cash = parseFloat(el('oCash').value) || 0;
 
-function placeOrder() {
-    if (!el('oCust').value)      { showMsg('Please select a customer.', 'error'); return; }
-    if (!currentOrderItems.length) { showMsg('Please add at least one vehicle.', 'error'); return; }
+    const net = total - (total * disc / 100);
+    const bal = cash - net;
 
-    const subtotal = currentOrderItems.reduce((s, x) => s + x.total, 0);
-    const disc     = parseFloat(el('oDisc').value) || 0;
-    const net      = subtotal * (1 - disc / 100);
-    const cash     = parseFloat(el('oCash').value) || 0;
-    const bal      = parseFloat((el('oBal').value || '0').replace(/[^\d.-]/g, '')) || 0;
+    const order = addOrderData(
+        el('oId').value,
+        el('oDate').value,
+        el('oCust').value,
+        el('oCustName').value,
+        [...currentOrderItems],
+        net,
+        disc,
+        cash,
+        bal
+    );
 
-    const orderId  = el('oId').value;
-    const date     = el('oDate').value;
-    const custId   = el('oCust').value;
-    const custName = el('oCustName').value;
-    const items    = [...currentOrderItems];
-
-    addOrderData(orderId, date, custId, custName, items, net, disc, cash, bal);
-
-    // stock reduce
-    items.forEach(item => {
-        const v = vehicle_db.find(x => x.id === item.id);
-        if (v) v.qty -= item.qty;
+    // reduce stock
+    currentOrderItems.forEach(i => {
+        const v = vehicle_db.find(x => x.id === i.id);
+        if (v) v.qty -= i.qty;
     });
 
-    showMsg('✅ Order placed successfully!');
+    // SAVE TO STORAGE (IMPORTANT FIX)
+    localStorage.setItem("pos_orders", JSON.stringify(order_db));
 
-    // reset form
+    showMsg("Order placed!");
+
     currentOrderItems = [];
     renderOrderItems();
-    el('oId').value   = uid('ORD');
-    el('oDate').value = new Date().toISOString().split('T')[0];
-    ['oCust','oVeh'].forEach(f => { el(f).value = ''; });
-    ['oCustName','oCustAddr','oVehName','oVehPrice','oVehStock','oQty','oDisc','oCash','oBal']
-        .forEach(f => { el(f).value = ''; });
-    el('oTotal').textContent = 'Rs. 0.00';
-    populateOrderSelects();
+    initOrder();
+
+    window.renderHist();
+    window.updateDash();
 }
 
-function renderHist(data) {
-    data = data || getAllOrderData();
+// ---------------- HISTORY ----------------
+function renderHist() {
+    const data = getAllOrderData();
     const tb = el('histTbl');
+
     if (!data.length) {
-        tb.innerHTML = '<tr class="empty-row"><td colspan="9">No orders yet. Place your first order!</td></tr>';
+        tb.innerHTML = `<tr><td colspan="9">No orders</td></tr>`;
         return;
     }
+
     tb.innerHTML = data.slice().reverse().map(o => `
         <tr>
-            <td><span class="badge badge-gold">${o.orderId}</span></td>
-            <td style="color:#888;font-size:12px">${o.date}</td>
-            <td style="font-weight:600">${o.custName || o.custId}</td>
-            <td>${o.items.map(i => i.name).join('<br>')}</td>
-            <td style="text-align:center"><span class="badge badge-blue">${o.items.reduce((s,i) => s + i.qty, 0)}</span></td>
-            <td style="font-weight:700;color:#06d6a0">Rs. ${Number(o.total).toFixed(2)}</td>
-            <td><span class="badge badge-gold">${o.discount || 0}%</span></td>
-            <td>Rs. ${Number(o.cash).toFixed(2)}</td>
-            <td style="font-weight:700;color:${o.balance >= 0 ? '#06d6a0' : '#e94560'}">Rs. ${Number(o.balance).toFixed(2)}</td>
-        </tr>`).join('');
+            <td>${o.orderId}</td>
+            <td>${o.date}</td>
+            <td>${o.custName}</td>
+            <td>${o.items.map(i => i.name).join("<br>")}</td>
+            <td>${o.items.reduce((s,i)=>s+i.qty,0)}</td>
+            <td>${o.total}</td>
+            <td>${o.discount}</td>
+            <td>${o.cash}</td>
+            <td>${o.balance}</td>
+        </tr>
+    `).join('');
 }
 
+// ---------------- FILTER ----------------
 function filterHist() {
     const q = el('hSearch').value.toLowerCase();
-    renderHist(getAllOrderData().filter(o =>
-        o.orderId.toLowerCase().includes(q) ||
-        o.custId.toLowerCase().includes(q) ||
-        (o.custName || '').toLowerCase().includes(q)
-    ));
+    renderHist(
+        getAllOrderData().filter(o =>
+            o.orderId.toLowerCase().includes(q) ||
+            o.custName.toLowerCase().includes(q)
+        )
+    );
 }
 
-// window expose
-window.initOrder          = initOrder;
-window.populateOrderSelects = populateOrderSelects;
-window.fillCustInfo       = fillCustInfo;
-window.fillVehInfo        = fillVehInfo;
-window.addToOrder         = addToOrder;
-window.removeOrderItem    = removeOrderItem;
-window.renderOrderItems   = renderOrderItems;
-window.calcBalance        = calcBalance;
-window.placeOrder         = placeOrder;
-window.renderHist         = renderHist;
-window.filterHist         = filterHist;
-
-// state + window sync
-window.order_db  = order_db;
-state.orders     = order_db;
-
-// initial hist render
-renderHist();
+// ---------------- EXPORT ----------------
+window.initOrder = initOrder;
+window.fillCustInfo = fillCustInfo;
+window.fillVehInfo = fillVehInfo;
+window.addToOrder = addToOrder;
+window.removeOrderItem = removeOrderItem;
+window.calcBalance = calcBalance;
+window.placeOrder = placeOrder;
+window.renderHist = renderHist;
+window.filterHist = filterHist;
