@@ -1,11 +1,944 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoDrive POS - Vehicle Shop</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f8fafc;min-height:100vh}
+:root{
+  --pri:#0f4c75;--sec:#3282b8;--acc:#00a8cc;--gold:#f79824;--teal:#0ea5a5;
+  --green:#10b981;--card:#1a5f7a;--bg:#f8fafc;--light-blue:#d4e8f7;--soft-gray:#e8eef5;--border:#e2e8f0
+}
+.hidden{display:none!important}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;background:linear-gradient(135deg,#0f4c75 0%,#3282b8 50%,#1a5f7a 100%);display:flex;align-items:center;justify-content:center}
+.auth-box{background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border:1px solid rgba(13,148,184,0.15);border-radius:24px;padding:42px;width:400px;color:#0f4c75;box-shadow:0 20px 60px rgba(15,76,117,0.15)}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo .icon{font-size:48px;margin-bottom:8px}
+.auth-logo h2{font-size:24px;font-weight:700;color:#0f4c75;letter-spacing:0.5px}
+.auth-logo p{font-size:13px;color:#7c8ba8;margin-top:4px}
+.auth-tabs{display:flex;margin-bottom:24px;border-radius:12px;overflow:hidden;border:1px solid var(--soft-gray);background:#f8fafc}
+.auth-tab{flex:1;padding:11px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:#7c8ba8;background:transparent;transition:.3s;letter-spacing:.5px}
+.auth-tab.active{background:linear-gradient(135deg,#0d94b8,#00a8cc);color:#fff}
+.inp-grp{margin-bottom:14px}
+.inp-grp label{font-size:12px;color:#0f4c75;display:block;margin-bottom:5px;font-weight:700;letter-spacing:.3px}
+.inp-grp input{width:100%;background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:#0f4c75;font-size:13px;outline:none;transition:.3s;font-family:inherit}
+.inp-grp input:focus{border-color:#0d94b8;background:#fff;box-shadow:0 0 0 3px rgba(13,148,184,0.1)}
+.inp-grp input::placeholder{color:#a4b4c8}
+.btn-auth{width:100%;padding:13px;background:linear-gradient(135deg,#0d94b8,#00a8cc);border:none;border-radius:11px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:.3s;margin-top:6px;letter-spacing:.5px;box-shadow:0 4px 12px rgba(13,148,184,0.25)}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,148,184,0.35)}
+.auth-err{background:#fff5f5;border:1px solid #fddede;border-radius:10px;padding:12px;font-size:12px;color:#d32f2f;margin-top:10px;text-align:center;font-weight:600}
+
+/* NAVBAR */
+.navbar{background:linear-gradient(135deg,#0f4c75 0%,#1a5f7a 100%);padding:0 24px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(15,76,117,0.12)}
+.nav-brand{color:#fff;font-weight:700;font-size:18px;margin-right:20px;display:flex;align-items:center;gap:8px;flex-shrink:0;letter-spacing:0.5px}
+.nav-brand .logo-icon{font-size:24px}
+.nav-link{color:rgba(255,255,255,0.75);padding:10px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:.3s;display:flex;align-items:center;gap:6px;white-space:nowrap;user-select:none}
+.nav-link:hover,.nav-link.active{background:rgba(255,255,255,0.2);color:#fff}
+.nav-link.logout{color:#fca5a5;margin-left:auto}
+.nav-link.logout:hover{background:rgba(252,165,165,0.15)}
+
+/* MAIN CONTENT */
+.section-wrap{padding:28px;background:var(--bg);min-height:calc(100vh - 64px)}
+.page-header{background:linear-gradient(135deg,#0f4c75 0%,#0d94b8 100%);color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 12px rgba(15,76,117,0.15)}
+.page-header .ph-icon{font-size:32px}
+.page-header h4{font-size:22px;font-weight:700;margin:0;letter-spacing:0.3px}
+.page-header p{font-size:13px;color:rgba(255,255,255,.75);margin:4px 0 0}
+
+/* DASHBOARD */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:14px;padding:22px;border-left:5px solid #0d94b8;box-shadow:0 2px 8px rgba(15,76,117,0.08);transition:.3s;border:1px solid var(--soft-gray)}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(15,76,117,0.12);border-color:#0d94b8}
+.stat-card .s-icon{font-size:32px;margin-bottom:10px}
+.stat-card .s-label{font-size:11px;color:#7c8ba8;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.stat-card .s-val{font-size:28px;font-weight:800;color:#0f4c75;margin-top:6px}
+.stat-card.teal{border-left-color:#0ea5a5}
+.stat-card.gold{border-left-color:#f79824}
+.stat-card.green{border-left-color:#10b981}
+
+/* FORM LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:768px){.two-col{grid-template-columns:1fr}}
+.form-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(15,76,117,0.08);border:1px solid var(--soft-gray)}
+.form-card h6{font-size:13px;font-weight:700;color:#0f4c75;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--soft-gray);text-transform:uppercase;letter-spacing:.5px}
+.field{margin-bottom:14px}
+.field label{font-size:12px;font-weight:700;color:#0f4c75;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;color:#0f4c75;outline:none;transition:.3s;background:#f8fafc;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#0d94b8;background:#fff;box-shadow:0 0 0 3px rgba(13,148,184,0.08)}
+.field textarea{height:68px;resize:vertical}
+.field input[readonly]{background:#f1f5f9;color:#7c8ba8;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:18px}
+.btn{padding:10px 20px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:.3s;display:inline-flex;align-items:center;gap:6px;letter-spacing:.3px}
+.btn:hover{transform:translateY(-2px);opacity:.95;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.btn-save{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 2px 8px rgba(16,185,129,0.25)}
+.btn-upd{background:linear-gradient(135deg,#0ea5a5,#0d8a8a);color:#fff;box-shadow:0 2px 8px rgba(14,165,165,0.25)}
+.btn-del{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 2px 8px rgba(239,68,68,0.25)}
+.btn-clr{background:linear-gradient(135deg,#f79824,#f59e0b);color:#fff;box-shadow:0 2px 8px rgba(247,152,36,0.25)}
+
+/* TABLE */
+.tbl-wrap{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(15,76,117,0.08);border:1px solid var(--soft-gray)}
+.search-row{padding:16px;border-bottom:1px solid var(--soft-gray);display:flex;gap:10px;align-items:center}
+.search-row input{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;outline:none;transition:.3s;background:#f8fafc}
+.search-row input:focus{border-color:#0d94b8;background:#fff;box-shadow:0 0 0 3px rgba(13,148,184,0.08)}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:linear-gradient(135deg,#0f4c75,#1a5f7a);color:#fff;padding:14px;text-align:left;font-weight:600;white-space:nowrap;font-size:12px;letter-spacing:.3px}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--soft-gray);color:#0f4c75;vertical-align:middle}
+tbody tr:hover{background:#f8fafc;cursor:pointer;transition:.2s}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-green{background:#dcfce7;color:#16a34a}
+.badge-red{background:#fee2e2;color:#dc2626}
+.badge-gold{background:#fef3c7;color:#d97706}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.empty-row td{text-align:center;color:#a4b4c8;padding:32px;font-size:13px;font-weight:500}
+
+/* ORDER */
+.order-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-bottom:20px}
+.o-card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(15,76,117,0.08);border:1px solid var(--soft-gray)}
+.o-card .o-head{font-size:12px;font-weight:700;color:#fff;margin-bottom:16px;padding:12px 14px;background:linear-gradient(135deg,#0f4c75,#0d94b8);border-radius:9px;display:flex;align-items:center;gap:8px;letter-spacing:.3px}
+.total-display{background:linear-gradient(135deg,#0f4c75,#0d94b8);border-radius:12px;padding:20px;text-align:center;margin-bottom:18px}
+.total-display .lbl{font-size:11px;color:rgba(255,255,255,.75);font-weight:700;text-transform:uppercase;letter-spacing:.7px}
+.total-display .amt{font-size:36px;font-weight:800;color:#fff;margin-top:6px}
+.btn-full{width:100%;padding:12px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;letter-spacing:.3px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.btn-full:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.btn-add-item{background:linear-gradient(135deg,#0d94b8,#0ea5a5);color:#fff}
+.btn-calc{background:linear-gradient(135deg,#f79824,#f59e0b);color:#fff}
+.btn-place{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+
+/* TOAST */
+.toast{position:fixed;top:80px;right:24px;padding:14px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.15);animation:slideIn .3s ease;pointer-events:none;letter-spacing:0.3px}
+@keyframes slideIn{from{transform:translateX(120px);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-success{background:linear-gradient(135deg,#10b981,#059669)}
+.toast-error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.toast-info{background:linear-gradient(135deg,#0d94b8,#0ea5a5)}
+
+/* REMOVE BTN */
+.btn-remove{background:linear-gradient(135deg,#ef4444,#dc2626);border:none;color:#fff;border-radius:7px;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:700;transition:.3s;box-shadow:0 2px 6px rgba(239,68,68,0.2)}
+.btn-remove:hover{opacity:.85;transform:translateY(-1px)}
+
+/* RECENT TABLE */
+.dash-table-wrap{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(15,76,117,0.08);border:1px solid var(--soft-gray)}
+.dash-table-head{padding:18px 20px;border-bottom:1px solid var(--soft-gray);display:flex;align-items:center;gap:10px}
+.dash-table-head h6{font-size:13px;font-weight:700;color:#0f4c75;margin:0;text-transform:uppercase;letter-spacing:.4px}
+</style>
 </head>
 <body>
-    
+
+<!-- AUTH SECTION -->
+<div id="authSection">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <div class="icon">🚗</div>
+        <h2>Navi-Auto-Drive</h2>
+        <p>Vehicle Shop Management System</p>
+      </div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">LOGIN</div>
+        <div class="auth-tab" id="tabReg" onclick="switchTab('reg')">REGISTER</div>
+      </div>
+      <!-- LOGIN -->
+      <div id="loginPane">
+        <div class="inp-grp"><label>Email Address</label><input type="email" id="lEmail" placeholder="your@email.com"></div>
+        <div class="inp-grp"><label>Password</label><input type="password" id="lPass" placeholder="••••••••"></div>
+        <button class="btn-auth" onclick="doLogin()">🔑 &nbsp;LOGIN</button>
+        <div id="lErr" class="auth-err hidden"></div>
+      </div>
+      <!-- REGISTER -->
+      <div id="regPane" class="hidden">
+        <div class="inp-grp"><label>Full Name</label><input type="text" id="rUser" placeholder="John Silva"></div>
+        <div class="inp-grp"><label>Email Address</label><input type="email" id="rEmail" placeholder="your@email.com"></div>
+        <div class="inp-grp"><label>Password</label><input type="password" id="rPass" placeholder="••••••••"></div>
+        <div class="inp-grp"><label>Confirm Password</label><input type="password" id="rPass2" placeholder="••••••••"></div>
+        <button class="btn-auth" onclick="doRegister()">✅ &nbsp;CREATE ACCOUNT</button>
+        <div id="rErr" class="auth-err hidden"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand"><span class="logo-icon">🚗</span> Navi-Auto-Drive</div>
+    <div class="nav-link active" id="n_dash" onclick="nav('dash')"><i class="bi bi-speedometer2"></i> Dashboard</div>
+    <div class="nav-link" id="n_cust" onclick="nav('cust')"><i class="bi bi-people"></i> Customers</div>
+    <div class="nav-link" id="n_veh" onclick="nav('veh')"><i class="bi bi-car-front"></i> Vehicles</div>
+    <div class="nav-link" id="n_ord" onclick="nav('ord')"><i class="bi bi-cart3"></i> New Order</div>
+    <div class="nav-link" id="n_hist" onclick="nav('hist')"><i class="bi bi-receipt"></i> Orders</div>
+    <div class="nav-link logout" onclick="doLogout()"><i class="bi bi-box-arrow-right"></i> Logout</div>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="section-wrap" id="s_dash">
+    <div class="page-header">
+      <span class="ph-icon">📊</span>
+      <div><h4>Dashboard Overview</h4><p>Welcome back! Here's your shop summary.</p></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="s-icon">👥</div>
+        <div class="s-label">Total Customers</div>
+        <div class="s-val" id="dc_cust">0</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="s-icon">🚘</div>
+        <div class="s-label">Vehicles In Stock</div>
+        <div class="s-val" id="dc_veh">0</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="s-icon">🛒</div>
+        <div class="s-label">Total Orders</div>
+        <div class="s-val" id="dc_ord">0</div>
+      </div>
+      <div class="stat-card green">
+        <div class="s-icon">💰</div>
+        <div class="s-label">Total Revenue</div>
+        <div class="s-val" id="dc_rev">Rs.0</div>
+      </div>
+    </div>
+    <div class="dash-table-wrap">
+      <div class="dash-table-head"><h6>📈 Recent Orders</h6></div>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Vehicle(s)</th><th>Amount</th><th>Date</th></tr></thead>
+          <tbody id="recentOrdTbl"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="section-wrap hidden" id="s_cust">
+    <div class="page-header">
+      <span class="ph-icon">👥</span>
+      <div><h4>Customer Management</h4><p>Add, update and manage your customers.</p></div>
+    </div>
+    <div class="two-col">
+      <div class="form-card">
+        <h6>Customer Details</h6>
+        <div class="field"><label>Customer ID</label><input id="cId" placeholder="Auto-generated" readonly></div>
+        <div class="field"><label>First Name</label><input id="cFn" placeholder="First name"></div>
+        <div class="field"><label>Last Name</label><input id="cLn" placeholder="Last name"></div>
+        <div class="field"><label>Email</label><input id="cEm" placeholder="email@example.com"></div>
+        <div class="field"><label>Phone Number</label><input id="cPh" placeholder="+94 77 123 4567"></div>
+        <div class="field"><label>Address</label><textarea id="cAd" placeholder="Customer address..."></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-save" onclick="saveCust()">✅ Save</button>
+          <button class="btn btn-upd" onclick="updateCust()">🔄 Update</button>
+          <button class="btn btn-del" onclick="deleteCust()">🗑 Delete</button>
+          <button class="btn btn-clr" onclick="clearCust()">↺ Clear</button>
+        </div>
+      </div>
+      <div>
+        <div class="tbl-wrap">
+          <div class="search-row">
+            <input id="cSearch" placeholder="🔍 Search customer by name..." oninput="filterCust()">
+          </div>
+          <div class="tbl-scroll">
+            <table>
+              <thead><tr><th>ID</th><th>Full Name</th><th>Email</th><th>Phone</th></tr></thead>
+              <tbody id="custTbl"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VEHICLES -->
+  <div class="section-wrap hidden" id="s_veh">
+    <div class="page-header">
+      <span class="ph-icon">🚘</span>
+      <div><h4>Vehicle Inventory</h4><p>Manage your vehicle stock and pricing.</p></div>
+    </div>
+    <div class="two-col">
+      <div class="form-card">
+        <h6>Vehicle Details</h6>
+        <div class="field"><label>Vehicle ID</label><input id="vId" placeholder="Auto-generated" readonly></div>
+        <div class="field"><label>Make / Brand</label><input id="vMake" placeholder="e.g. Toyota, Honda, BMW"></div>
+        <div class="field"><label>Model</label><input id="vModel" placeholder="e.g. Corolla, Civic, X5"></div>
+        <div class="field"><label>Year</label><input id="vYear" placeholder="e.g. 2023" type="number" min="1900" max="2099"></div>
+        <div class="field"><label>Color</label><input id="vColor" placeholder="e.g. Pearl White, Midnight Black"></div>
+        <div class="field"><label>Stock Quantity</label><input id="vQty" placeholder="1" type="number" min="0"></div>
+        <div class="field"><label>Unit Price (Rs.)</label><input id="vPrice" placeholder="0.00" type="number" min="0" step="0.01"></div>
+        <div class="field"><label>Description / Features</label><textarea id="vDesc" placeholder="Mileage, condition, key features..."></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-save" onclick="saveVeh()">✅ Save</button>
+          <button class="btn btn-upd" onclick="updateVeh()">🔄 Update</button>
+          <button class="btn btn-del" onclick="deleteVeh()">🗑 Delete</button>
+          <button class="btn btn-clr" onclick="clearVeh()">↺ Clear</button>
+        </div>
+      </div>
+      <div>
+        <div class="tbl-wrap">
+          <div class="search-row">
+            <input id="vSearch" placeholder="🔍 Search by make or model..." oninput="filterVeh()">
+          </div>
+          <div class="tbl-scroll">
+            <table>
+              <thead><tr><th>ID</th><th>Make</th><th>Model</th><th>Year</th><th>Color</th><th>Stock</th><th>Price</th></tr></thead>
+              <tbody id="vehTbl"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW ORDER -->
+  <div class="section-wrap hidden" id="s_ord">
+    <div class="page-header">
+      <span class="ph-icon">🛒</span>
+      <div><h4>New Sale Order</h4><p>Create a new vehicle sale transaction.</p></div>
+    </div>
+    <div class="order-grid">
+      <!-- Invoice Info -->
+      <div class="o-card">
+        <div class="o-head"><i class="bi bi-receipt"></i> Invoice Info</div>
+        <div class="field"><label>Order ID</label><input id="oId" readonly></div>
+        <div class="field"><label>Date</label><input id="oDate" type="date"></div>
+        <div class="field"><label>Select Customer</label>
+          <select id="oCust" onchange="fillCustInfo()">
+            <option value="">-- Select Customer --</option>
+          </select>
+        </div>
+        <div class="field"><label>Customer Name</label><input id="oCustName" readonly></div>
+        <div class="field"><label>Customer Address</label><input id="oCustAddr" readonly></div>
+      </div>
+      <!-- Vehicle -->
+      <div class="o-card">
+        <div class="o-head"><i class="bi bi-car-front"></i> Vehicle Selection</div>
+        <div class="field"><label>Select Vehicle</label>
+          <select id="oVeh" onchange="fillVehInfo()">
+            <option value="">-- Select Vehicle --</option>
+          </select>
+        </div>
+        <div class="field"><label>Vehicle Name</label><input id="oVehName" readonly></div>
+        <div class="field"><label>Unit Price (Rs.)</label><input id="oVehPrice" readonly></div>
+        <div class="field"><label>Available Stock</label><input id="oVehStock" readonly></div>
+        <div class="field"><label>Order Quantity</label><input id="oQty" type="number" placeholder="1" min="1"></div>
+        <button class="btn-full btn-add-item" onclick="addToOrder()">➕ &nbsp;Add Vehicle to Order</button>
+      </div>
+      <!-- Payment -->
+      <div class="o-card">
+        <div class="o-head"><i class="bi bi-credit-card"></i> Payment Summary</div>
+        <div class="total-display">
+          <div class="lbl">Total Amount</div>
+          <div class="amt" id="oTotal">Rs. 0.00</div>
+        </div>
+        <div class="field"><label>Discount (%)</label><input id="oDisc" type="number" placeholder="0" min="0" max="100"></div>
+        <div class="field"><label>Cash Received (Rs.)</label><input id="oCash" type="number" placeholder="0.00" min="0"></div>
+        <div class="field"><label>Balance (Rs.)</label><input id="oBal" readonly></div>
+        <button class="btn-full btn-calc" onclick="calcBalance()">🧮 &nbsp;Calculate Balance</button>
+        <button class="btn-full btn-place" onclick="placeOrder()">✅ &nbsp;Place Order</button>
+      </div>
+    </div>
+    <!-- Order Items Table -->
+    <div class="tbl-wrap">
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Vehicle ID</th><th>Vehicle</th><th>Unit Price</th><th>Qty</th><th>Total (Rs.)</th><th>Action</th></tr></thead>
+          <tbody id="orderItemsTbl"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER HISTORY -->
+  <div class="section-wrap hidden" id="s_hist">
+    <div class="page-header">
+      <span class="ph-icon">📋</span>
+      <div><h4>Order History</h4><p>View all completed sale transactions.</p></div>
+    </div>
+    <div class="tbl-wrap">
+      <div class="search-row">
+        <input id="hSearch" placeholder="🔍 Search by Order ID or Customer name..." oninput="filterHist()">
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th><th>Date</th><th>Customer</th><th>Vehicle(s)</th>
+              <th>Qty</th><th>Total (Rs.)</th><th>Discount</th><th>Cash</th><th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="histTbl"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end mainApp -->
+
+<script>
+// ============================================================
+// DATA & STORAGE
+// ============================================================
+let state = {
+  customers: [
+    {
+      id: 'C1001',
+      firstName: 'Kasun',
+      lastName: 'Perera',
+      email: 'kasun.perera@example.com',
+      phone: '+94 77 123 4567',
+      address: 'No. 12, Galle Road, Colombo'
+    },
+    {
+      id: 'C1002',
+      firstName: 'Nimali',
+      lastName: 'Silva',
+      email: 'nimali.silva@example.com',
+      phone: '+94 71 998 7744',
+      address: 'No. 45, Kandy Road, Kurunegala'
+    },
+    {
+      id: 'C1003',
+      firstName: 'Ravindu',
+      lastName: 'Fernando',
+      email: 'ravindu.fernando@example.com',
+      phone: '+94 76 245 3344',
+      address: 'No. 8, Temple Street, Gampaha'
+    },
+    {
+      id: 'C1004',
+      firstName: 'Tharushi',
+      lastName: 'Jayasena',
+      email: 'tharushi.jayasena@example.com',
+      phone: '+94 75 886 1122',
+      address: 'No. 22, Main Street, Matara'
+    }
+  ],
+  vehicles: [
+    {
+      id: 'V2001',
+      make: 'Toyota',
+      model: 'Corolla',
+      year: '2022',
+      color: 'Pearl White',
+      qty: 3,
+      price: 28900,
+      desc: 'Hybrid, low mileage, automatic transmission'
+    },
+    {
+      id: 'V2002',
+      make: 'Honda',
+      model: 'Civic',
+      year: '2021',
+      color: 'Midnight Black',
+      qty: 2,
+      price: 27450,
+      desc: 'Turbo engine, full service record'
+    },
+    {
+      id: 'V2003',
+      make: 'Nissan',
+      model: 'X-Trail',
+      year: '2020',
+      color: 'Gunmetal Gray',
+      qty: 1,
+      price: 35600,
+      desc: 'SUV, AWD, leather seats'
+    },
+    {
+      id: 'V2004',
+      make: 'Suzuki',
+      model: 'Swift',
+      year: '2023',
+      color: 'Red',
+      qty: 4,
+      price: 21400,
+      desc: 'Compact hatchback, fuel efficient'
+    }
+  ],
+  orders: [
+    {
+      orderId: 'ORD3001',
+      date: '2026-04-25',
+      custId: 'C1001',
+      custName: 'Kasun Perera',
+      items: [
+        { id: 'V2002', name: 'Honda Civic 2021', price: 27450, qty: 1, total: 27450 }
+      ],
+      total: 26901,
+      discount: 2,
+      cash: 28000,
+      balance: 1099
+    },
+    {
+      orderId: 'ORD3002',
+      date: '2026-04-27',
+      custId: 'C1003',
+      custName: 'Ravindu Fernando',
+      items: [
+        { id: 'V2004', name: 'Suzuki Swift 2023', price: 21400, qty: 1, total: 21400 }
+      ],
+      total: 21400,
+      discount: 0,
+      cash: 22000,
+      balance: 600
+    },
+    {
+      orderId: 'ORD3003',
+      date: '2026-04-28',
+      custId: 'C1002',
+      custName: 'Nimali Silva',
+      items: [
+        { id: 'V2001', name: 'Toyota Corolla 2022', price: 28900, qty: 1, total: 28900 }
+      ],
+      total: 28322,
+      discount: 2,
+      cash: 29000,
+      balance: 678
+    }
+  ]
+};
+let users = [];
+let currentOrderItems = [];
+
+function saveState() { return; }
+function uid(prefix) { return prefix + Date.now().toString(36).toUpperCase().slice(-6); }
+function $(id) { return document.getElementById(id); }
+
+// ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+function showMsg(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchTab(t) {
+  $('tabLogin').className = 'auth-tab' + (t==='login' ? ' active' : '');
+  $('tabReg').className   = 'auth-tab' + (t==='reg'   ? ' active' : '');
+  $('loginPane').className = t==='login' ? '' : 'hidden';
+  $('regPane').className   = t==='reg'   ? '' : 'hidden';
+  $('lErr').classList.add('hidden');
+  $('rErr').classList.add('hidden');
+}
+
+function doLogin() {
+  const email = $('lEmail').value.trim();
+  const pass  = $('lPass').value;
+  if (!email || !pass) { showAuthErr('lErr', 'Please fill in all fields'); return; }
+  const user = users.find(u => u.email === email && u.password === pass);
+  if (!user) { showAuthErr('lErr', 'Invalid email or password'); return; }
+  showApp();
+}
+
+function doRegister() {
+  const name  = $('rUser').value.trim();
+  const email = $('rEmail').value.trim();
+  const pass  = $('rPass').value;
+  const pass2 = $('rPass2').value;
+  if (!name || !email || !pass || !pass2) { showAuthErr('rErr','Please fill in all fields'); return; }
+  if (pass !== pass2) { showAuthErr('rErr','Passwords do not match'); return; }
+  if (users.find(u => u.email === email)) { showAuthErr('rErr','Email already registered'); return; }
+  users.push({ id: uid('U'), username: name, email, password: pass });
+  showMsg('Registration successful! Please login.', 'success');
+  switchTab('login');
+  $('rUser').value = $('rEmail').value = $('rPass').value = $('rPass2').value = '';
+}
+
+function doLogout() {
+  users = [];
+  $('mainApp').className = 'hidden';
+  $('authSection').className = '';
+  $('lEmail').value = ''; $('lPass').value = '';
+  $('rUser').value = ''; $('rEmail').value = ''; $('rPass').value = ''; $('rPass2').value = '';
+  $('lErr').classList.add('hidden');
+  $('rErr').classList.add('hidden');
+  switchTab('login');
+}
+
+function showAuthErr(id, msg) {
+  const el = $(id);
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 3500);
+}
+
+function showApp() {
+  $('authSection').className = 'hidden';
+  $('mainApp').className = '';
+  nav('dash');
+}
+
+// Auth remains visible by default; runtime memory clears on refresh/restart.
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function nav(page) {
+  ['dash','cust','veh','ord','hist'].forEach(p => {
+    $('s_' + p).className = 'section-wrap' + (p !== page ? ' hidden' : '');
+    $('n_' + p).className = 'nav-link' + (p === page ? ' active' : '');
+  });
+  if (page === 'ord')  initOrder();
+  if (page === 'hist') renderHist();
+  if (page === 'dash') updateDash();
+  if (page === 'cust') renderCust();
+  if (page === 'veh')  renderVeh();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function updateDash() {
+  $('dc_cust').textContent = state.customers.length;
+  $('dc_veh').textContent  = state.vehicles.length;
+  $('dc_ord').textContent  = state.orders.length;
+  const rev = state.orders.reduce((s, o) => s + o.total, 0);
+  $('dc_rev').textContent = 'Rs. ' + rev.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+  const tb = $('recentOrdTbl');
+  const recent = state.orders.slice(-8).reverse();
+  if (!recent.length) {
+    tb.innerHTML = '<tr class="empty-row"><td colspan="5">No orders yet — create your first sale!</td></tr>';
+    return;
+  }
+  tb.innerHTML = recent.map(o => `
+    <tr>
+      <td><span class="badge badge-gold">${o.orderId}</span></td>
+      <td style="font-weight:600">${o.custName || o.custId}</td>
+      <td>${o.items.map(i => i.name).join(', ')}</td>
+      <td style="font-weight:700;color:#06d6a0">Rs. ${o.total.toFixed(2)}</td>
+      <td style="color:#888;font-size:12px">${o.date}</td>
+    </tr>`).join('');
+}
+
+// ============================================================
+// CUSTOMERS
+// ============================================================
+function renderCust(data) {
+  data = data || state.customers;
+  const tb = $('custTbl');
+  if (!data.length) {
+    tb.innerHTML = '<tr class="empty-row"><td colspan="4">No customers found. Add your first customer!</td></tr>';
+    return;
+  }
+  tb.innerHTML = data.map(c => `
+    <tr onclick="selectCust('${c.id}')">
+      <td><span class="badge badge-gold">${c.id}</span></td>
+      <td style="font-weight:600">${c.firstName} ${c.lastName}</td>
+      <td style="color:var(--teal)">${c.email || '-'}</td>
+      <td>${c.phone || '-'}</td>
+    </tr>`).join('');
+}
+
+function saveCust() {
+  const fn = $('cFn').value.trim(), ln = $('cLn').value.trim();
+  if (!fn || !ln) { showMsg('Please enter first and last name.', 'error'); return; }
+  state.customers.push({
+    id: uid('C'),
+    firstName: fn, lastName: ln,
+    email: $('cEm').value.trim(),
+    phone: $('cPh').value.trim(),
+    address: $('cAd').value.trim()
+  });
+  saveState(); renderCust(); showMsg('Customer saved successfully!'); clearCust();
+}
+
+function selectCust(id) {
+  const c = state.customers.find(x => x.id === id);
+  if (!c) return;
+  $('cId').value = c.id; $('cFn').value = c.firstName; $('cLn').value = c.lastName;
+  $('cEm').value = c.email || ''; $('cPh').value = c.phone || ''; $('cAd').value = c.address || '';
+}
+
+function updateCust() {
+  const id = $('cId').value;
+  if (!id) { showMsg('Please select a customer to update.', 'error'); return; }
+  const i = state.customers.findIndex(x => x.id === id);
+  if (i < 0) return;
+  state.customers[i] = { ...state.customers[i],
+    firstName: $('cFn').value.trim(), lastName: $('cLn').value.trim(),
+    email: $('cEm').value.trim(), phone: $('cPh').value.trim(), address: $('cAd').value.trim()
+  };
+  saveState(); renderCust(); showMsg('Customer updated!', 'info'); clearCust();
+}
+
+function deleteCust() {
+  const id = $('cId').value;
+  if (!id) { showMsg('Please select a customer to delete.', 'error'); return; }
+  if (!confirm('Delete this customer?')) return;
+  state.customers = state.customers.filter(x => x.id !== id);
+  saveState(); renderCust(); showMsg('Customer deleted.', 'error'); clearCust();
+}
+
+function clearCust() {
+  ['cId','cFn','cLn','cEm','cPh','cAd'].forEach(f => $(f).value = '');
+}
+
+function filterCust() {
+  const q = $('cSearch').value.toLowerCase();
+  renderCust(state.customers.filter(c => (c.firstName+' '+c.lastName).toLowerCase().includes(q)));
+}
+
+renderCust();
+
+// ============================================================
+// VEHICLES
+// ============================================================
+function renderVeh(data) {
+  data = data || state.vehicles;
+  const tb = $('vehTbl');
+  if (!data.length) {
+    tb.innerHTML = '<tr class="empty-row"><td colspan="7">No vehicles in stock. Add your first vehicle!</td></tr>';
+    return;
+  }
+  tb.innerHTML = data.map(v => `
+    <tr onclick="selectVeh('${v.id}')">
+      <td><span class="badge badge-blue">${v.id}</span></td>
+      <td style="font-weight:700">${v.make}</td>
+      <td>${v.model}</td>
+      <td>${v.year || '-'}</td>
+      <td>${v.color || '-'}</td>
+      <td><span class="badge ${v.qty > 0 ? 'badge-green' : 'badge-red'}">${v.qty}</span></td>
+      <td style="font-weight:700;color:#06d6a0">Rs. ${Number(v.price).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    </tr>`).join('');
+}
+
+function saveVeh() {
+  const mk = $('vMake').value.trim(), mo = $('vModel').value.trim();
+  if (!mk || !mo) { showMsg('Please enter make and model.', 'error'); return; }
+  state.vehicles.push({
+    id: uid('V'), make: mk, model: mo,
+    year: $('vYear').value || '',
+    color: $('vColor').value.trim(),
+    qty: parseInt($('vQty').value) || 1,
+    price: parseFloat($('vPrice').value) || 0,
+    desc: $('vDesc').value.trim()
+  });
+  saveState(); renderVeh(); showMsg('Vehicle added to inventory!'); clearVeh();
+}
+
+function selectVeh(id) {
+  const v = state.vehicles.find(x => x.id === id);
+  if (!v) return;
+  $('vId').value = v.id; $('vMake').value = v.make; $('vModel').value = v.model;
+  $('vYear').value = v.year || ''; $('vColor').value = v.color || '';
+  $('vQty').value = v.qty; $('vPrice').value = v.price; $('vDesc').value = v.desc || '';
+}
+
+function updateVeh() {
+  const id = $('vId').value;
+  if (!id) { showMsg('Please select a vehicle to update.', 'error'); return; }
+  const i = state.vehicles.findIndex(x => x.id === id);
+  if (i < 0) return;
+  state.vehicles[i] = { ...state.vehicles[i],
+    make: $('vMake').value.trim(), model: $('vModel').value.trim(),
+    year: $('vYear').value, color: $('vColor').value.trim(),
+    qty: parseInt($('vQty').value) || 0,
+    price: parseFloat($('vPrice').value) || 0,
+    desc: $('vDesc').value.trim()
+  };
+  saveState(); renderVeh(); showMsg('Vehicle updated!', 'info'); clearVeh();
+}
+
+function deleteVeh() {
+  const id = $('vId').value;
+  if (!id) { showMsg('Please select a vehicle to delete.', 'error'); return; }
+  if (!confirm('Remove this vehicle from inventory?')) return;
+  state.vehicles = state.vehicles.filter(x => x.id !== id);
+  saveState(); renderVeh(); showMsg('Vehicle removed.', 'error'); clearVeh();
+}
+
+function clearVeh() {
+  ['vId','vMake','vModel','vYear','vColor','vQty','vPrice','vDesc'].forEach(f => $(f).value = '');
+}
+
+function filterVeh() {
+  const q = $('vSearch').value.toLowerCase();
+  renderVeh(state.vehicles.filter(v => (v.make+' '+v.model).toLowerCase().includes(q)));
+}
+
+renderVeh();
+
+// ============================================================
+// ORDER
+// ============================================================
+function initOrder() {
+  $('oId').value = uid('ORD');
+  $('oDate').value = new Date().toISOString().split('T')[0];
+  populateOrderSelects();
+  if (!currentOrderItems.length) renderOrderItems();
+}
+
+function populateOrderSelects() {
+  $('oCust').innerHTML = '<option value="">-- Select Customer --</option>' +
+    state.customers.map(c => `<option value="${c.id}">${c.id} — ${c.firstName} ${c.lastName}</option>`).join('');
+  $('oVeh').innerHTML = '<option value="">-- Select Vehicle --</option>' +
+    state.vehicles.filter(v => v.qty > 0)
+      .map(v => `<option value="${v.id}">${v.id} — ${v.make} ${v.model} ${v.year || ''} (Stock: ${v.qty})</option>`).join('');
+}
+
+function fillCustInfo() {
+  const c = state.customers.find(x => x.id === $('oCust').value);
+  $('oCustName').value = c ? `${c.firstName} ${c.lastName}` : '';
+  $('oCustAddr').value = c ? (c.address || '') : '';
+}
+
+function fillVehInfo() {
+  const v = state.vehicles.find(x => x.id === $('oVeh').value);
+  $('oVehName').value  = v ? `${v.make} ${v.model} ${v.year||''}`.trim() : '';
+  $('oVehPrice').value = v ? `Rs. ${v.price.toFixed(2)}` : '';
+  $('oVehStock').value = v ? v.qty : '';
+}
+
+function addToOrder() {
+  const vid = $('oVeh').value;
+  if (!vid) { showMsg('Please select a vehicle.', 'error'); return; }
+  const v = state.vehicles.find(x => x.id === vid);
+  if (!v) return;
+  const qty = parseInt($('oQty').value) || 1;
+  if (qty < 1) { showMsg('Quantity must be at least 1.', 'error'); return; }
+
+  // Check total already ordered + new qty
+  const ex = currentOrderItems.find(x => x.id === vid);
+  const alreadyOrdered = ex ? ex.qty : 0;
+  if (alreadyOrdered + qty > v.qty) {
+    showMsg(`Only ${v.qty - alreadyOrdered} more available in stock!`, 'error'); return;
+  }
+
+  if (ex) {
+    ex.qty += qty;
+    ex.total = ex.qty * ex.price;
+  } else {
+    currentOrderItems.push({ id: vid, name: `${v.make} ${v.model} ${v.year||''}`.trim(), price: v.price, qty, total: qty * v.price });
+  }
+
+  renderOrderItems();
+  $('oVeh').value = ''; $('oQty').value = '';
+  $('oVehName').value = ''; $('oVehPrice').value = ''; $('oVehStock').value = '';
+  showMsg(`${v.make} ${v.model} added to order.`);
+}
+
+function removeOrderItem(id) {
+  currentOrderItems = currentOrderItems.filter(x => x.id !== id);
+  renderOrderItems();
+}
+
+function renderOrderItems() {
+  const tot = currentOrderItems.reduce((s, x) => s + x.total, 0);
+  $('oTotal').textContent = 'Rs. ' + tot.toFixed(2);
+  const tb = $('orderItemsTbl');
+  if (!currentOrderItems.length) {
+    tb.innerHTML = '<tr class="empty-row"><td colspan="6">No vehicles added yet. Select a vehicle above.</td></tr>';
+    return;
+  }
+  tb.innerHTML = currentOrderItems.map(x => `
+    <tr>
+      <td><span class="badge badge-blue">${x.id}</span></td>
+      <td style="font-weight:600">${x.name}</td>
+      <td>Rs. ${x.price.toFixed(2)}</td>
+      <td style="font-weight:700">${x.qty}</td>
+      <td style="font-weight:700;color:#06d6a0">Rs. ${x.total.toFixed(2)}</td>
+      <td><button class="btn-remove" onclick="removeOrderItem('${x.id}')">✕ Remove</button></td>
+    </tr>`).join('');
+}
+
+function calcBalance() {
+  const subtotal = currentOrderItems.reduce((s, x) => s + x.total, 0);
+  const disc = parseFloat($('oDisc').value) || 0;
+  const discAmt = subtotal * (disc / 100);
+  const net = subtotal - discAmt;
+  const cash = parseFloat($('oCash').value) || 0;
+  const bal = cash - net;
+  $('oTotal').textContent = 'Rs. ' + net.toFixed(2);
+  $('oBal').value = 'Rs. ' + bal.toFixed(2);
+  if (bal < 0) showMsg('Insufficient cash! Balance is negative.', 'error');
+  else showMsg('Balance calculated.', 'info');
+}
+
+function placeOrder() {
+  if (!$('oCust').value) { showMsg('Please select a customer.', 'error'); return; }
+  if (!currentOrderItems.length) { showMsg('Please add at least one vehicle.', 'error'); return; }
+
+  const subtotal = currentOrderItems.reduce((s, x) => s + x.total, 0);
+  const disc = parseFloat($('oDisc').value) || 0;
+  const net = subtotal * (1 - disc / 100);
+  const cash = parseFloat($('oCash').value) || 0;
+  const bal = parseFloat(($('oBal').value || '0').replace(/[^\d.-]/g, '')) || 0;
+
+  const order = {
+    orderId: $('oId').value,
+    date: $('oDate').value,
+    custId: $('oCust').value,
+    custName: $('oCustName').value,
+    items: [...currentOrderItems],
+    total: net,
+    discount: disc,
+    cash,
+    balance: bal
+  };
+
+  // Deduct stock
+  order.items.forEach(item => {
+    const i = state.vehicles.findIndex(v => v.id === item.id);
+    if (i >= 0) state.vehicles[i].qty -= item.qty;
+  });
+
+  state.orders.push(order);
+  saveState();
+  showMsg('✅ Order placed successfully!');
+
+  // Reset order form
+  currentOrderItems = [];
+  renderOrderItems();
+  $('oId').value = uid('ORD');
+  $('oDate').value = new Date().toISOString().split('T')[0];
+  ['oCust','oVeh'].forEach(f => $(f).value = '');
+  ['oCustName','oCustAddr','oVehName','oVehPrice','oVehStock','oQty','oDisc','oCash','oBal'].forEach(f => $(f).value = '');
+  $('oTotal').textContent = 'Rs. 0.00';
+  populateOrderSelects();
+}
+
+// ============================================================
+// ORDER HISTORY
+// ============================================================
+function renderHist(data) {
+  data = data || state.orders;
+  const tb = $('histTbl');
+  if (!data.length) {
+    tb.innerHTML = '<tr class="empty-row"><td colspan="9">No orders yet. Place your first order!</td></tr>';
+    return;
+  }
+  tb.innerHTML = data.slice().reverse().map(o => `
+    <tr>
+      <td><span class="badge badge-gold">${o.orderId}</span></td>
+      <td style="color:#888;font-size:12px">${o.date}</td>
+      <td style="font-weight:600">${o.custName || o.custId}</td>
+      <td>${o.items.map(i => i.name).join('<br>')}</td>
+      <td style="text-align:center"><span class="badge badge-blue">${o.items.reduce((s,i)=>s+i.qty,0)}</span></td>
+      <td style="font-weight:700;color:#06d6a0">Rs. ${o.total.toFixed(2)}</td>
+      <td><span class="badge badge-gold">${o.discount || 0}%</span></td>
+      <td>Rs. ${o.cash.toFixed(2)}</td>
+      <td style="font-weight:700;color:${o.balance >= 0 ? '#06d6a0' : '#e94560'}">Rs. ${o.balance.toFixed(2)}</td>
+    </tr>`).join('');
+}
+
+function filterHist() {
+  const q = $('hSearch').value.toLowerCase();
+  renderHist(state.orders.filter(o =>
+    o.orderId.toLowerCase().includes(q) ||
+    o.custId.toLowerCase().includes(q) ||
+    (o.custName || '').toLowerCase().includes(q)
+  ));
+}
+</script>
 </body>
 </html>
