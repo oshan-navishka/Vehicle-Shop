@@ -10,19 +10,21 @@ function nav(page) {
         if (!section || !link) return;
 
         /* ---------------- SECTION SHOW/HIDE ---------------- */
-        if (p === page) {
-            section.classList.remove('d-none');
-        } else {
-            section.classList.add('d-none');
-        }
+        section.classList.toggle('d-none', p !== page);
 
         /* ---------------- NAV ACTIVE STATE ---------------- */
-        link.classList.remove('active', 'text-white');
-        link.classList.add(p === page ? 'active' : 'text-white-50');
+        if (p === page) {
+            link.classList.add('active', 'text-white', 'fw-bold');
+            link.classList.remove('text-white-50');
+        } else {
+            link.classList.remove('active', 'fw-bold');
+            link.classList.add('text-white-50');
+        }
     });
 
     /* ---------------- PAGE INIT ---------------- */
     setTimeout(() => {
+
         if (page === 'dash' && typeof window.updateDash === 'function') {
             window.updateDash();
         }
@@ -42,6 +44,7 @@ function nav(page) {
         if (page === 'hist' && typeof window.renderHist === 'function') {
             window.renderHist();
         }
+
     }, 50);
 }
 
