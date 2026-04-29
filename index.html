@@ -4,280 +4,557 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AutoDrive POS - Vehicle Shop</title>
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link rel="stylesheet" href="view/style.css">
+<style>
+  /* Optional: minimal body styling */
+  body { 
+    background-color: #f8f9fa; 
+  }
+
+</style>
 </head>
 <body>
-<!-- AUTH SECTION -->
-<div id="authSection">
-  <div class="auth-wrap">
-    <div class="auth-box">
-      <div class="auth-logo">
-        <div class="icon">🚗</div>
-        <h2>Navi-Auto-Drive</h2>
-        <p>Vehicle Shop Management System</p>
-      </div>
-      <div class="auth-tabs">
-        <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">LOGIN</div>
-        <div class="auth-tab" id="tabReg" onclick="switchTab('reg')">REGISTER</div>
-      </div>
 
-      
-      <!-- LOGIN -->
-      <div id="loginPane">
-        <div class="inp-grp"><label>Email Address</label><input type="email" id="lEmail" placeholder="your@email.com"></div>
-        <div class="inp-grp"><label>Password</label><input type="password" id="lPass" placeholder="••••••••"></div>
-        <button class="btn-auth" onclick="doLogin()">🔑 &nbsp;LOGIN</button>
-        <div id="lErr" class="auth-err hidden"></div>
-      </div>
-      <!-- REGISTER -->
-      <div id="regPane" class="hidden">
-        <div class="inp-grp"><label>Full Name</label><input type="text" id="rUser" placeholder="Oshan Navishka"></div>
-        <div class="inp-grp"><label>Email Address</label><input type="email" id="rEmail" placeholder="your@email.com"></div>
-        <div class="inp-grp"><label>Password</label><input type="password" id="rPass" placeholder="••••••••"></div>
-        <div class="inp-grp"><label>Confirm Password</label><input type="password" id="rPass2" placeholder="••••••••"></div>
-        <button class="btn-auth" onclick="doRegister()">✅ &nbsp;CREATE ACCOUNT</button>
-        <div id="rErr" class="auth-err hidden"></div>
+<!-- AUTH SECTION -->
+<div id="authSection" class="bg-primary bg-gradient d-flex align-items-center w-100 min-vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-5">
+        <div class="card shadow-lg border-0 p-4 rounded-4">
+          <div class="text-center mb-4">
+            <div class="display-4 mb-2">🚗</div>
+            <h2 class="fw-bold text-primary">Navi-Auto-Drive</h2>
+            <p class="text-muted">Vehicle Shop Management System</p>
+          </div>
+          
+          <!-- Nav Tabs -->
+          <ul class="nav nav-pills nav-justified mb-4" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold" id="tabLoginBtn" data-bs-toggle="pill" data-bs-target="#loginPane" type="button" role="tab" onclick="switchTab('login')">LOGIN</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold" id="tabRegBtn" data-bs-toggle="pill" data-bs-target="#regPane" type="button" role="tab" onclick="switchTab('reg')">REGISTER</button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="authTabContent">
+            <!-- LOGIN -->
+            <div class="tab-pane fade show active" id="loginPane" role="tabpanel">
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Email Address</label>
+                <input type="email" class="form-control" id="lEmail" placeholder="your@email.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Password</label>
+                <input type="password" class="form-control" id="lPass" placeholder="••••••••">
+              </div>
+              <button class="btn btn-primary w-100 py-2 fw-bold" onclick="doLogin()">🔑 LOGIN</button>
+              <div id="lErr" class="alert alert-danger mt-3 py-2 text-center fw-bold hidden"></div>
+            </div>
+            
+            <!-- REGISTER -->
+            <div class="tab-pane fade" id="regPane" role="tabpanel">
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Full Name</label>
+                <input type="text" class="form-control" id="rUser" placeholder="Oshan Navishka">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Email Address</label>
+                <input type="email" class="form-control" id="rEmail" placeholder="your@email.com">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Password</label>
+                <input type="password" class="form-control" id="rPass" placeholder="••••••••">
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Confirm Password</label>
+                <input type="password" class="form-control" id="rPass2" placeholder="••••••••">
+              </div>
+              <button class="btn btn-primary w-100 py-2 fw-bold" onclick="doRegister()">✅ CREATE ACCOUNT</button>
+              <div id="rErr" class="alert alert-danger mt-3 py-2 text-center fw-bold hidden"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- MAIN APP -->
-<div id="mainApp" class="hidden">
+<div id="mainApp" class="d-none">
 
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="nav-brand"><span class="logo-icon">🚗</span> Navi-Auto-Drive</div>
-    <div class="nav-link active" id="n_dash" onclick="nav('dash')"><i class="bi bi-speedometer2"></i> Dashboard</div>
-    <div class="nav-link" id="n_cust" onclick="nav('cust')"><i class="bi bi-people"></i> Customers</div>
-    <div class="nav-link" id="n_veh" onclick="nav('veh')"><i class="bi bi-car-front"></i> Vehicles</div>
-    <div class="nav-link" id="n_ord" onclick="nav('ord')"><i class="bi bi-cart3"></i> New Order</div>
-    <div class="nav-link" id="n_hist" onclick="nav('hist')"><i class="bi bi-receipt"></i> Orders</div>
-    <div class="nav-link logout" onclick="doLogout()"><i class="bi bi-box-arrow-right"></i> Logout</div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary bg-gradient sticky-top shadow-sm px-3 py-2">
+    <div class="container-fluid">
+      <a class="navbar-brand text-white fw-bold d-flex align-items-center gap-2" href="#">
+        <span class="fs-4">🚗</span> Navi-Auto-Drive
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
+          <li class="nav-item">
+            <a class="nav-link text-white" id="n_dash" onclick="nav('dash')" style="cursor:pointer;"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50" id="n_cust" onclick="nav('cust')" style="cursor:pointer;"><i class="bi bi-people me-1"></i> Customers</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50" id="n_veh" onclick="nav('veh')" style="cursor:pointer;"><i class="bi bi-car-front me-1"></i> Vehicles</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50" id="n_ord" onclick="nav('ord')" style="cursor:pointer;"><i class="bi bi-cart3 me-1"></i> New Order</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50" id="n_hist" onclick="nav('hist')" style="cursor:pointer;"><i class="bi bi-receipt me-1"></i> Orders</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          <a class="nav-link text-danger fw-bold" onclick="doLogout()" style="cursor:pointer;"><i class="bi bi-box-arrow-right me-1"></i> Logout</a>
+        </div>
+      </div>
+    </div>
   </nav>
 
-  <!-- DASHBOARD -->
-  <div class="section-wrap" id="s_dash">
-    <div class="page-header">
-      <span class="ph-icon">📊</span>
-      <div><h4>Dashboard Overview</h4><p>Welcome back! Here's your shop summary.</p></div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="s-icon">👥</div>
-        <div class="s-label">Total Customers</div>
-        <div class="s-val" id="dc_cust">0</div>
-      </div>
-      <div class="stat-card teal">
-        <div class="s-icon">🚘</div>
-        <div class="s-label">Vehicles In Stock</div>
-        <div class="s-val" id="dc_veh">0</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="s-icon">🛒</div>
-        <div class="s-label">Total Orders</div>
-        <div class="s-val" id="dc_ord">0</div>
-      </div>
-      <div class="stat-card green">
-        <div class="s-icon">💰</div>
-        <div class="s-label">Total Revenue</div>
-        <div class="s-val" id="dc_rev">Rs.0</div>
-      </div>
-    </div>
-    <div class="dash-table-wrap">
-      <div class="dash-table-head"><h6>📈 Recent Orders</h6></div>
-      <div class="tbl-scroll">
-        <table>
-          <thead><tr><th>Order ID</th><th>Customer</th><th>Vehicle(s)</th><th>Amount</th><th>Date</th></tr></thead>
-          <tbody id="recentOrdTbl"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- CUSTOMERS -->
-  <div class="section-wrap hidden" id="s_cust">
-    <div class="page-header">
-      <span class="ph-icon">👥</span>
-      <div><h4>Customer Management</h4><p>Add, update and manage your customers.</p></div>
-    </div>
-    <div class="two-col">
-      <div class="form-card">
-        <h6>Customer Details</h6>
-        <div class="field"><label>Customer ID</label><input id="cId" placeholder="Auto-generated" readonly></div>
-        <div class="field"><label>First Name</label><input id="cFn" placeholder="First name"></div>
-        <div class="field"><label>Last Name</label><input id="cLn" placeholder="Last name"></div>
-        <div class="field"><label>Email</label><input id="cEm" placeholder="email@example.com"></div>
-        <div class="field"><label>Phone Number</label><input id="cPh" placeholder="+94 77 123 4567"></div>
-        <div class="field"><label>Address</label><textarea id="cAd" placeholder="Customer address..."></textarea></div>
-        <div class="btn-row">
-          <button class="btn btn-save" onclick="saveCust()">✅ Save</button>
-          <button class="btn btn-upd" onclick="updateCust()">🔄 Update</button>
-          <button class="btn btn-del" onclick="deleteCust()">🗑 Delete</button>
-          <button class="btn btn-clr" onclick="clearCust()">↺ Clear</button>
+  <div class="container-fluid py-4 px-lg-4">
+    
+    <!-- DASHBOARD -->
+    <div id="s_dash">
+      <div class="card bg-primary bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="display-5">📊</span>
+          <div>
+            <h4 class="mb-1 fw-bold">Dashboard Overview</h4>
+            <p class="mb-0 text-white-50">Welcome back! Here's your shop summary.</p>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="tbl-wrap">
-          <div class="search-row">
-            <input id="cSearch" placeholder="🔍 Search customer by name..." oninput="filterCust()">
+      
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-4 mb-4">
+        <div class="col">
+          <div class="card h-100 border-0 shadow-sm border-start border-5 border-primary p-3 rounded-4">
+            <div class="fs-1 mb-2">👥</div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 12px; letter-spacing: 0.5px;">Total Customers</div>
+            <div class="fs-2 fw-bold text-primary" id="dc_cust">0</div>
           </div>
-          <div class="tbl-scroll">
-            <table>
-              <thead><tr><th>ID</th><th>Full Name</th><th>Email</th><th>Phone</th></tr></thead>
-              <tbody id="custTbl"></tbody>
+        </div>
+        <div class="col">
+          <div class="card h-100 border-0 shadow-sm border-start border-5 border-info p-3 rounded-4">
+            <div class="fs-1 mb-2">🚘</div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 12px; letter-spacing: 0.5px;">Vehicles In Stock</div>
+            <div class="fs-2 fw-bold text-info" id="dc_veh">0</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 border-0 shadow-sm border-start border-5 border-warning p-3 rounded-4">
+            <div class="fs-1 mb-2">🛒</div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 12px; letter-spacing: 0.5px;">Total Orders</div>
+            <div class="fs-2 fw-bold text-warning" id="dc_ord">0</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 border-0 shadow-sm border-start border-5 border-success p-3 rounded-4">
+            <div class="fs-1 mb-2">💰</div>
+            <div class="text-uppercase fw-bold text-muted" style="font-size: 12px; letter-spacing: 0.5px;">Total Revenue</div>
+            <div class="fs-2 fw-bold text-success" id="dc_rev">Rs.0</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4">
+          <h6 class="mb-0 fw-bold text-uppercase text-primary">📈 Recent Orders</h6>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+              <thead class="table-primary">
+                <tr><th>Order ID</th><th>Customer</th><th>Vehicle(s)</th><th>Amount</th><th>Date</th></tr>
+              </thead>
+              <tbody id="recentOrdTbl"></tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- VEHICLES -->
- <div class="section-wrap hidden" id="s_veh">
-    <div class="page-header">
-      <span class="ph-icon">🚘</span>
-      <div><h4>Vehicle Inventory</h4><p>Manage your vehicle stock and pricing.</p></div>
-    </div>
-    <div class="two-col">
-      <div class="form-card">
-        <h6>Vehicle Details</h6>
-        <div class="field"><label>Vehicle ID</label><input id="vId" placeholder="Auto-generated" readonly></div>
-        <div class="field"><label>Make / Brand</label><input id="vMake" placeholder="e.g. Toyota, Honda, BMW"></div>
-        <div class="field"><label>Model</label><input id="vModel" placeholder="e.g. Corolla, Civic, X5"></div>
-        <div class="field"><label>Year</label><input id="vYear" placeholder="e.g. 2023" type="number" min="1900" max="2099"></div>
-        <div class="field"><label>Color</label><input id="vColor" placeholder="e.g. Pearl White, Midnight Black"></div>
-        <div class="field"><label>Stock Quantity</label><input id="vQty" placeholder="1" type="number" min="0"></div>
-        <div class="field"><label>Unit Price (Rs.)</label><input id="vPrice" placeholder="0.00" type="number" min="0" step="0.01"></div>
-        <div class="field"><label>Description / Features</label><textarea id="vDesc" placeholder="Mileage, condition, key features..."></textarea></div>
-        <div class="btn-row">
-          <button class="btn btn-save" onclick="saveVeh()">✅ Save</button>
-          <button class="btn btn-upd" onclick="updateVeh()">🔄 Update</button>
-          <button class="btn btn-del" onclick="deleteVeh()">🗑 Delete</button>
-          <button class="btn btn-clr" onclick="clearVeh()">↺ Clear</button>
+    <!-- CUSTOMERS -->
+    <div id="s_cust" class="d-none">
+      <div class="card bg-primary bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="display-5">👥</span>
+          <div>
+            <h4 class="mb-1 fw-bold">Customer Management</h4>
+            <p class="mb-0 text-white-50">Add, update and manage your customers.</p>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="tbl-wrap">
-          <div class="search-row">
-            <input id="vSearch" placeholder="🔍 Search by make or model..." oninput="filterVeh()">
+      
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body">
+              <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3 text-primary">Customer Details</h6>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Customer ID</label>
+                <input class="form-control bg-light" id="cId" placeholder="Auto-generated" readonly>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">First Name</label>
+                  <input class="form-control" id="cFn" placeholder="First name">
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Last Name</label>
+                  <input class="form-control" id="cLn" placeholder="Last name">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Email</label>
+                <input type="email" class="form-control" id="cEm" placeholder="email@example.com">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Phone Number</label>
+                <input class="form-control" id="cPh" placeholder="+94 77 123 4567">
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Address</label>
+                <textarea class="form-control" id="cAd" rows="2" placeholder="Customer address..."></textarea>
+              </div>
+              <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <button class="btn btn-success fw-bold" onclick="saveCust()">✅ Save</button>
+                <button class="btn btn-info text-white fw-bold" onclick="updateCust()">🔄 Update</button>
+                <button class="btn btn-danger fw-bold" onclick="deleteCust()">🗑 Delete</button>
+                <button class="btn btn-warning text-white fw-bold" onclick="clearCust()">↺ Clear</button>
+              </div>
+            </div>
           </div>
-          <div class="tbl-scroll">
-            <table>
-              <thead><tr><th>ID</th><th>Make</th><th>Model</th><th>Year</th><th>Color</th><th>Stock</th><th>Price</th></tr></thead>
-              <tbody id="vehTbl"></tbody>
+        </div>
+        
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-header bg-white p-3 border-bottom-0 rounded-top-4">
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">🔍</span>
+                <input class="form-control bg-light border-start-0" id="cSearch" placeholder="Search customer by name..." oninput="filterCust()">
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                  <thead class="table-primary">
+                    <tr><th>ID</th><th>Full Name</th><th>Email</th><th>Phone</th></tr>
+                  </thead>
+                  <tbody id="custTbl"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VEHICLES -->
+    <div id="s_veh" class="d-none">
+      <div class="card bg-primary bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="display-5">🚘</span>
+          <div>
+            <h4 class="mb-1 fw-bold">Vehicle Inventory</h4>
+            <p class="mb-0 text-white-50">Manage your vehicle stock and pricing.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body">
+              <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3 text-primary">Vehicle Details</h6>
+              <div class="mb-3">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Vehicle ID</label>
+                <input class="form-control bg-light" id="vId" placeholder="Auto-generated" readonly>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Make / Brand</label>
+                  <input class="form-control" id="vMake" placeholder="e.g. Toyota">
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Model</label>
+                  <input class="form-control" id="vModel" placeholder="e.g. Corolla">
+                </div>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Year</label>
+                  <input type="number" class="form-control" id="vYear" placeholder="2023" min="1900" max="2099">
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Color</label>
+                  <input class="form-control" id="vColor" placeholder="Pearl White">
+                </div>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Stock Qty</label>
+                  <input type="number" class="form-control" id="vQty" placeholder="1" min="0">
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small text-uppercase">Price (Rs.)</label>
+                  <input type="number" class="form-control" id="vPrice" placeholder="0.00" min="0" step="0.01">
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Description</label>
+                <textarea class="form-control" id="vDesc" rows="2" placeholder="Features..."></textarea>
+              </div>
+              <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <button class="btn btn-success fw-bold" onclick="saveVeh()">✅ Save</button>
+                <button class="btn btn-info text-white fw-bold" onclick="updateVeh()">🔄 Update</button>
+                <button class="btn btn-danger fw-bold" onclick="deleteVeh()">🗑 Delete</button>
+                <button class="btn btn-warning text-white fw-bold" onclick="clearVeh()">↺ Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-header bg-white p-3 border-bottom-0 rounded-top-4">
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">🔍</span>
+                <input class="form-control bg-light border-start-0" id="vSearch" placeholder="Search by make or model..." oninput="filterVeh()">
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                  <thead class="table-primary">
+                    <tr><th>ID</th><th>Make</th><th>Model</th><th>Year</th><th>Color</th><th>Stock</th><th>Price</th></tr>
+                  </thead>
+                  <tbody id="vehTbl"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW ORDER -->
+    <div id="s_ord" class="d-none">
+      <div class="card bg-primary bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="display-5">🛒</span>
+          <div>
+            <h4 class="mb-1 fw-bold">New Sale Order</h4>
+            <p class="mb-0 text-white-50">Create a new vehicle sale transaction.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row g-4 mb-4">
+        <!-- Invoice Info -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100 p-3 rounded-4">
+            <div class="bg-primary bg-gradient text-white p-2 rounded-2 mb-3 fw-bold small"><i class="bi bi-receipt me-2"></i> Invoice Info</div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Order ID</label>
+              <input class="form-control bg-light form-control-sm" id="oId" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Date</label>
+              <input type="date" class="form-control form-control-sm" id="oDate">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Select Customer</label>
+              <select class="form-select form-select-sm" id="oCust" onchange="fillCustInfo()">
+                <option value="">-- Select Customer --</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Customer Name</label>
+              <input class="form-control bg-light form-control-sm" id="oCustName" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Customer Address</label>
+              <input class="form-control bg-light form-control-sm" id="oCustAddr" readonly>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Vehicle -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100 p-3 rounded-4">
+            <div class="bg-primary bg-gradient text-white p-2 rounded-2 mb-3 fw-bold small"><i class="bi bi-car-front me-2"></i> Vehicle Selection</div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Select Vehicle</label>
+              <select class="form-select form-select-sm" id="oVeh" onchange="fillVehInfo()">
+                <option value="">-- Select Vehicle --</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Vehicle Name</label>
+              <input class="form-control bg-light form-control-sm" id="oVehName" readonly>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Unit Price (Rs.)</label>
+                <input class="form-control bg-light form-control-sm" id="oVehPrice" readonly>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Available Stock</label>
+                <input class="form-control bg-light form-control-sm" id="oVehStock" readonly>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Order Quantity</label>
+              <input type="number" class="form-control form-control-sm" id="oQty" placeholder="1" min="1">
+            </div>
+            <button class="btn btn-info text-white w-100 fw-bold mt-auto py-2" onclick="addToOrder()">➕ Add Vehicle to Order</button>
+          </div>
+        </div>
+        
+        <!-- Payment -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100 p-3 rounded-4">
+            <div class="bg-primary bg-gradient text-white p-2 rounded-2 mb-3 fw-bold small"><i class="bi bi-credit-card me-2"></i> Payment Summary</div>
+            <div class="bg-primary bg-gradient text-white p-3 rounded-3 text-center mb-3">
+              <div class="small fw-bold text-uppercase text-white-50">Total Amount</div>
+              <div class="fs-3 fw-bold" id="oTotal">Rs. 0.00</div>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Discount (%)</label>
+                <input type="number" class="form-control form-control-sm" id="oDisc" placeholder="0" min="0" max="100">
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold text-secondary small text-uppercase">Cash (Rs.)</label>
+                <input type="number" class="form-control form-control-sm" id="oCash" placeholder="0.00" min="0">
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-bold text-secondary small text-uppercase">Balance (Rs.)</label>
+              <input class="form-control bg-light form-control-sm" id="oBal" readonly>
+            </div>
+            <div class="d-flex flex-column gap-2 mt-auto">
+              <button class="btn btn-warning text-white w-100 fw-bold py-2" onclick="calcBalance()">🧮 Calculate Balance</button>
+              <button class="btn btn-success w-100 fw-bold py-2" onclick="placeOrder()">✅ Place Order</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order Items Table -->
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+              <thead class="table-primary">
+                <tr><th>Vehicle ID</th><th>Vehicle</th><th>Unit Price</th><th>Qty</th><th>Total (Rs.)</th><th>Action</th></tr>
+              </thead>
+              <tbody id="orderItemsTbl"></tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- NEW ORDER -->
-  <div class="section-wrap hidden" id="s_ord">
-    <div class="page-header">
-      <span class="ph-icon">🛒</span>
-      <div><h4>New Sale Order</h4><p>Create a new vehicle sale transaction.</p></div>
-    </div>
-    <div class="order-grid">
-      <!-- Invoice Info -->
-      <div class="o-card">
-        <div class="o-head"><i class="bi bi-receipt"></i> Invoice Info</div>
-        <div class="field"><label>Order ID</label><input id="oId" readonly></div>
-        <div class="field"><label>Date</label><input id="oDate" type="date"></div>
-        <div class="field"><label>Select Customer</label>
-          <select id="oCust" onchange="fillCustInfo()">
-            <option value="">-- Select Customer --</option>
-          </select>
+    <!-- ORDER HISTORY -->
+    <div id="s_hist" class="d-none">
+      <div class="card bg-primary bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="display-5">📋</span>
+          <div>
+            <h4 class="mb-1 fw-bold">Order History</h4>
+            <p class="mb-0 text-white-50">View all completed sale transactions.</p>
+          </div>
         </div>
-        <div class="field"><label>Customer Name</label><input id="oCustName" readonly></div>
-        <div class="field"><label>Customer Address</label><input id="oCustAddr" readonly></div>
       </div>
-      <!-- Vehicle -->
-      <div class="o-card">
-        <div class="o-head"><i class="bi bi-car-front"></i> Vehicle Selection</div>
-        <div class="field"><label>Select Vehicle</label>
-          <select id="oVeh" onchange="fillVehInfo()">
-            <option value="">-- Select Vehicle --</option>
-          </select>
+      
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white p-3 border-bottom-0 rounded-top-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">🔍</span>
+            <input class="form-control bg-light border-start-0" id="hSearch" placeholder="Search by Order ID or Customer name..." oninput="filterHist()">
+          </div>
         </div>
-        <div class="field"><label>Vehicle Name</label><input id="oVehName" readonly></div>
-        <div class="field"><label>Unit Price (Rs.)</label><input id="oVehPrice" readonly></div>
-        <div class="field"><label>Available Stock</label><input id="oVehStock" readonly></div>
-        <div class="field"><label>Order Quantity</label><input id="oQty" type="number" placeholder="1" min="1"></div>
-        <button class="btn-full btn-add-item" onclick="addToOrder()">➕ &nbsp;Add Vehicle to Order</button>
-      </div>
-      <!-- Payment -->
-      <div class="o-card">
-        <div class="o-head"><i class="bi bi-credit-card"></i> Payment Summary</div>
-        <div class="total-display">
-          <div class="lbl">Total Amount</div>
-          <div class="amt" id="oTotal">Rs. 0.00</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+              <thead class="table-primary">
+                <tr>
+                  <th>Order ID</th><th>Date</th><th>Customer</th><th>Vehicle(s)</th>
+                  <th>Qty</th><th>Total (Rs.)</th><th>Discount</th><th>Cash</th><th>Balance</th>
+                </tr>
+              </thead>
+              <tbody id="histTbl"></tbody>
+            </table>
+          </div>
         </div>
-        <div class="field"><label>Discount (%)</label><input id="oDisc" type="number" placeholder="0" min="0" max="100"></div>
-        <div class="field"><label>Cash Received (Rs.)</label><input id="oCash" type="number" placeholder="0.00" min="0"></div>
-        <div class="field"><label>Balance (Rs.)</label><input id="oBal" readonly></div>
-        <button class="btn-full btn-calc" onclick="calcBalance()">🧮 &nbsp;Calculate Balance</button>
-        <button class="btn-full btn-place" onclick="placeOrder()">✅ &nbsp;Place Order</button>
       </div>
     </div>
-    <!-- Order Items Table -->
-    <div class="tbl-wrap">
-      <div class="tbl-scroll">
-        <table>
-          <thead><tr><th>Vehicle ID</th><th>Vehicle</th><th>Unit Price</th><th>Qty</th><th>Total (Rs.)</th><th>Action</th></tr></thead>
-          <tbody id="orderItemsTbl"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
-  <!-- ORDER HISTORY -->
-<div class="section-wrap hidden" id="s_hist">
-    <div class="page-header">
-      <span class="ph-icon">📋</span>
-      <div><h4>Order History</h4><p>View all completed sale transactions.</p></div>
-    </div>
-    <div class="tbl-wrap">
-      <div class="search-row">
-        <input id="hSearch" placeholder="🔍 Search by Order ID or Customer name..." oninput="filterHist()">
-      </div>
-      <div class="tbl-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Order ID</th><th>Date</th><th>Customer</th><th>Vehicle(s)</th>
-              <th>Qty</th><th>Total (Rs.)</th><th>Discount</th><th>Cash</th><th>Balance</th>
-            </tr>
-          </thead>
-          <tbody id="histTbl"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
+  </div> <!-- end container -->
 </div><!-- end mainApp -->
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100" id="toastContainer">
+</div>
 
 <script>
 function $(id) { return document.getElementById(id); }
 function uid(prefix) { return prefix + Date.now().toString(36).toUpperCase().slice(-6); }
 function saveState() {}
 function showMsg(msg, type='success') {
-    const el = document.createElement('div');
-    el.className = 'toast toast-' + type;
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2800);
+    const toastContainer = document.getElementById('toastContainer');
+    const toastEl = document.createElement('div');
+    const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+    
+    toastEl.className = `toast align-items-center text-white border-0 ${bgClass} show`;
+    toastEl.setAttribute('role', 'alert');
+    toastEl.setAttribute('aria-live', 'assertive');
+    toastEl.setAttribute('aria-atomic', 'true');
+    
+    toastEl.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body fw-bold">
+          ${msg}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    `;
+    
+    toastContainer.appendChild(toastEl);
+    
+    setTimeout(() => {
+        toastEl.classList.remove('show');
+        setTimeout(() => toastEl.remove(), 300);
+    }, 2800);
 }
 const state = { customers: [], vehicles: [], orders: [] };
+
+// Quick shim to keep the original switchTab working if needed
+function switchTab(tab) {
+    if(tab === 'login') {
+        document.getElementById('tabLoginBtn').click();
+    } else {
+        document.getElementById('tabRegBtn').click();
+    }
+}
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="controller/navigationController.js"></script>
-
 <script type="module" src="controller/loginController.js"></script>
 <script type="module" src="controller/dashboardController.js"></script>
 <script type="module" src="controller/customerController.js"></script>
