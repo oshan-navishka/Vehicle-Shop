@@ -390,31 +390,12 @@ function showMsg(msg, type='success') {
 }
 
 
-
-
-
-
-
-
-
 </script>
 
 <!-- Libraries -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- jQuery-aware $ wrapper: returns DOM element for plain ids, otherwise delegates to jQuery -->
-<script>
-  (function(){
-    const jq = window.jQuery || window.$ || null;
-    window.$jq = jq;
-    window.$ = function(sel){
-      if (typeof sel !== 'string') return jq ? jq(sel) : sel;
-      if (/^[A-Za-z0-9_-]+$/.test(sel)) return document.getElementById(sel);
-      return jq ? jq(sel) : document.querySelectorAll(sel);
-    };
-  })();
-</script>
 
 <!-- Shared DB + Utilities -->
 <script src="db/db.js"></script>

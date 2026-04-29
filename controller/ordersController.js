@@ -7,6 +7,7 @@ import {
   getOrderDataById
 } from "../model/ordersModel.js";
 
+
 const orderScope = $('#orderSection').length ? '#orderSection ' : '';
 const orderResetButton = $('#orderSection').length ? '#order_btnReset' : '#btnReset';
 
