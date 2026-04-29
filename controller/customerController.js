@@ -48,14 +48,21 @@ $('#custTbl').on('click', 'tr', function() {
 });
 
 window.saveCust = function() {
-    const customerId        = $('#cId').val().trim();
+    // Auto-generate ID if field is empty or disabled
+    let customerId = $('#cId').val().trim();
+    if (!customerId) {
+        const ids = getAllCustomerData().map(c => parseInt(c.id.replace(/\D/g, '')) || 0);
+        const maxId = ids.length > 0 ? Math.max(...ids) : 1000;
+        customerId = 'C' + (maxId + 1);
+        $('#cId').val(customerId);
+    }
+
     const customerFirstName = $('#cFn').val().trim();
     const customerLastName  = $('#cLn').val().trim();
     const customerEmail     = $('#cEm').val().trim();
     const customerPhone     = $('#cPh').val().trim();
     const customerAddress   = $('#cAd').val().trim();
 
-    if (!customerId)        { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
     if (getCustomerDataById(customerId)) { Swal.fire({ icon:'error', title:'Oops...', text:'ID already exists!' }); return; }
     if (!customerFirstName) { Swal.fire({ icon:'error', title:'Oops...', text:'First name is required!' }); return; }
     if (!customerLastName)  { Swal.fire({ icon:'error', title:'Oops...', text:'Last name is required!' }); return; }

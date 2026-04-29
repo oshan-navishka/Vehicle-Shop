@@ -32,11 +32,19 @@ $('#vehTbl').on('click', 'tr', function() {
 });
 
 window.saveVeh = function() {
-    const id = $('#vId').val().trim(), make = $('#vMake').val().trim(), model = $('#vModel').val().trim();
+    // Auto-generate Vehicle ID if empty or readonly
+    let id = $('#vId').val().trim();
+    if (!id) {
+        const ids = getAllVehicleData().map(v => parseInt(v.id.replace(/\D/g, '')) || 0);
+        const maxId = ids.length > 0 ? Math.max(...ids) : 2000;
+        id = 'V' + (maxId + 1);
+        $('#vId').val(id);
+    }
+
+    const make = $('#vMake').val().trim(), model = $('#vModel').val().trim();
     const year = $('#vYear').val().trim(), color = $('#vColor').val().trim();
     const qty = $('#vQty').val().trim(), price = $('#vPrice').val().trim(), desc = $('#vDesc').val().trim();
 
-    if (!id)    { Swal.fire({ icon:'error', title:'Oops...', text:'ID is required!' }); return; }
     if (getVehicleDataById(id)) { Swal.fire({ icon:'error', title:'Oops...', text:'ID already exists!' }); return; }
     if (!make)  { Swal.fire({ icon:'error', title:'Oops...', text:'Make is required!' }); return; }
     if (!model) { Swal.fire({ icon:'error', title:'Oops...', text:'Model is required!' }); return; }
@@ -81,6 +89,16 @@ window.deleteVeh = function() {
     loadVehicleTbl();
     Swal.fire({ icon:'success', title:'Vehicle Deleted!', showConfirmButton:false, timer:1500 });
     clearForm();
+};
+
+window.filterVeh = function() {
+    const query = $('#vSearch').val().toLowerCase();
+    $('#vehTbl tr').each(function() {
+        const make  = $(this).find('td:eq(1)').text().toLowerCase();
+        const model = $(this).find('td:eq(2)').text().toLowerCase();
+        const id    = $(this).find('td:eq(0)').text().toLowerCase();
+        $(this).toggle(make.includes(query) || model.includes(query) || id.includes(query));
+    });
 };
 
 window.clearVeh = clearForm;
