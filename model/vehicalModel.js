@@ -1,78 +1,108 @@
 import { vehicle_db } from "../db/db.js";
 
-const STORAGE_KEY = "pos_vehicles";
-
-// ---------- SAVE ----------
-const saveVehicles = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicle_db));
-};
-
-// ---------- CLASS ----------
+/* =========================
+   VEHICLE CLASS
+========================= */
 class Vehicle {
+    #id;
+    #make;
+    #model;
+    #year;
+    #color;
+    #qty;
+    #price;
+    #desc;
+
     constructor(id, make, model, year, color, qty, price, desc) {
-        this.id = id;
-        this.make = make;
-        this.model = model;
-        this.year = year;
-        this.color = color;
-        this.qty = Number(qty);
-        this.price = Number(price);
-        this.desc = desc;
+        this.#id = id;
+        this.#make = make;
+        this.#model = model;
+        this.#year = year;
+        this.#color = color;
+        this.#qty = Number(qty);
+        this.#price = Number(price);
+        this.#desc = desc;
     }
+
+    get id() { return this.#id; }
+    get make() { return this.#make; }
+    get model() { return this.#model; }
+    get year() { return this.#year; }
+    get color() { return this.#color; }
+    get qty() { return this.#qty; }
+    get price() { return this.#price; }
+    get desc() { return this.#desc; }
+
+    set id(v) { this.#id = v; }
+    set make(v) { this.#make = v; }
+    set model(v) { this.#model = v; }
+    set year(v) { this.#year = v; }
+    set color(v) { this.#color = v; }
+    set qty(v) { this.#qty = Number(v); }
+    set price(v) { this.#price = Number(v); }
+    set desc(v) { this.#desc = v; }
 }
 
-// ---------- LOAD ON START ----------
-const loadVehicles = () => {
-    const data = localStorage.getItem(STORAGE_KEY);
-
-    if (!data) {
-        saveVehicles(); // first time seed save
-        return;
-    }
-
-    const parsed = JSON.parse(data);
-
-    vehicle_db.length = 0;
-    vehicle_db.push(...parsed.map(v =>
-        new Vehicle(v.id, v.make, v.model, v.year, v.color, v.qty, v.price, v.desc)
-    ));
+/* =========================
+   LOCAL STORAGE SYNC
+========================= */
+const syncVehicles = () => {
+    localStorage.setItem("pos_vehicles", JSON.stringify(vehicle_db));
 };
 
-// run once
-loadVehicles();
-
-// ---------- ADD ----------
-export const addVehicleData = (id, make, model, year, color, qty, price, desc) => {
+/* =========================
+   ADD
+========================= */
+const addVehicleData = (id, make, model, year, color, qty, price, desc) => {
     const v = new Vehicle(id, make, model, year, color, qty, price, desc);
     vehicle_db.push(v);
-    saveVehicles();
+    syncVehicles();
     return v;
 };
 
-// ---------- UPDATE ----------
-export const updateVehicleData = (index, id, make, model, year, color, qty, price, desc) => {
+/* =========================
+   UPDATE
+========================= */
+const updateVehicleData = (index, id, make, model, year, color, qty, price, desc) => {
     const v = vehicle_db[index];
+    if (!v) return null;
 
     v.id = id;
     v.make = make;
     v.model = model;
     v.year = year;
     v.color = color;
-    v.qty = Number(qty);
-    v.price = Number(price);
+    v.qty = qty;
+    v.price = price;
     v.desc = desc;
 
-    saveVehicles();
+    syncVehicles();
     return v;
 };
 
-// ---------- DELETE ----------
-export const deleteVehicleData = (index) => {
+/* =========================
+   DELETE
+========================= */
+const deleteVehicleData = (index) => {
     vehicle_db.splice(index, 1);
-    saveVehicles();
+    syncVehicles();
 };
 
-// ---------- GET ----------
-export const getAllVehicleData = () => vehicle_db;
-export const getVehicleDataByIndex = (i) => vehicle_db[i];
-export const getVehicleDataById = (id) => vehicle_db.find(v => v.id === id);
+/* =========================
+   GETTERS
+========================= */
+const getAllVehicleData = () => vehicle_db;
+const getVehicleDataByIndex = (i) => vehicle_db[i];
+const getVehicleDataById = (id) => vehicle_db.find(v => v.id === id);
+
+/* =========================
+   EXPORT
+========================= */
+export {
+    addVehicleData,
+    updateVehicleData,
+    deleteVehicleData,
+    getAllVehicleData,
+    getVehicleDataByIndex,
+    getVehicleDataById
+};
