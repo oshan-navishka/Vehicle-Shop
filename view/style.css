@@ -1,5 +1,12 @@
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f8fafc;min-height:100vh}
+*{
+    box-sizing:border-box;
+    margin:0;padding:0
+}
+
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:#f8fafc;min-height:100vh
+}
 :root{
   --pri:#0f4c75;--sec:#3282b8;--acc:#00a8cc;--gold:#f79824;--teal:#0ea5a5;
   --green:#10b981;--card:#1a5f7a;--bg:#f8fafc;--light-blue:#d4e8f7;--soft-gray:#e8eef5;--border:#e2e8f0
