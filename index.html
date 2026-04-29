@@ -253,7 +253,7 @@ tbody tr:hover{background:#f8fafc;cursor:pointer;transition:.2s}
   </div>
 
   <!-- VEHICLES -->
-  <div class="section-wrap hidden" id="s_veh">
+ <div class="section-wrap hidden" id="s_veh">
     <div class="page-header">
       <span class="ph-icon">🚘</span>
       <div><h4>Vehicle Inventory</h4><p>Manage your vehicle stock and pricing.</p></div>
@@ -352,7 +352,7 @@ tbody tr:hover{background:#f8fafc;cursor:pointer;transition:.2s}
   </div>
 
   <!-- ORDER HISTORY -->
-  <div class="section-wrap hidden" id="s_hist">
+<div class="section-wrap hidden" id="s_hist">
     <div class="page-header">
       <span class="ph-icon">📋</span>
       <div><h4>Order History</h4><p>View all completed sale transactions.</p></div>
@@ -397,23 +397,14 @@ function showMsg(msg, type='success') {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-<!-- Shared DB + Utilities -->
-<script src="db/db.js"></script>
-<script src="util/regex_util.js"></script>
 
-<!-- Models & View -->
-<script src="model/loginModel.js"></script>
-<script src="model/customerModel.js"></script>
-<script src="model/vehicalModel.js"></script>
-<script src="model/ordersModel.js"></script>
-<script src="view/view.js"></script>
-
-<!-- Controllers -->
 <script src="controller/loginController.js"></script>
-<script src="controller/customerController.js"></script>
-<script src="controller/vehicalController.js"></script>
-<script src="controller/ordersController.js"></script>
 <script src="controller/navigationController.js"></script>
-<script src="controller/dashboardController.js"></script>
+
+
+<script type="module" src="controller/customerController.js"></script>
+<script type="module" src="controller/vehicalController.js"></script>
+<script type="module" src="controller/ordersController.js"></script>
+
 </body>
 </html>
