@@ -378,30 +378,23 @@ tbody tr:hover{background:#f8fafc;cursor:pointer;transition:.2s}
 </div><!-- end mainApp -->
 
 <script>
-// ============================================================
-// TOAST NOTIFICATIONS
-// ============================================================
+function $(id) { return document.getElementById(id); }
+function uid(prefix) { return prefix + Date.now().toString(36).toUpperCase().slice(-6); }
+function saveState() {}
 function showMsg(msg, type='success') {
-  const el = document.createElement('div');
-  el.className = 'toast toast-' + type;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2800);
+    const el = document.createElement('div');
+    el.className = 'toast toast-' + type;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2800);
 }
-
-
+const state = { customers: [], vehicles: [], orders: [] };
 </script>
 
-<!-- Libraries -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-
 <script src="controller/loginController.js"></script>
 <script src="controller/navigationController.js"></script>
-
-
 <script type="module" src="controller/customerController.js"></script>
 <script type="module" src="controller/vehicalController.js"></script>
 <script type="module" src="controller/ordersController.js"></script>

@@ -19,6 +19,4 @@ export const order_db = [
 ];
 
 export const users = [];
-export let currentOrderItems = [];
-
-export { customer_db, vehicle_db, order_db, users, currentOrderItems };
+export const currentOrderItems = [];
