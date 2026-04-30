@@ -17,7 +17,6 @@ export function addOrderData(orderId, date, custId, custName, items, total, disc
 
     order_db.push(newOrder);
 
-    // persist
     localStorage.setItem("pos_orders", JSON.stringify(order_db));
 
     return newOrder;

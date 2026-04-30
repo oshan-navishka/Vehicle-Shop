@@ -43,16 +43,12 @@ class Vehicle {
     set desc(v) { this.#desc = v; }
 }
 
-/* =========================
-   LOCAL STORAGE SYNC
-========================= */
+// ---------------- SYNC STORAGE ----------------
 const syncVehicles = () => {
     localStorage.setItem("pos_vehicles", JSON.stringify(vehicle_db));
 };
 
-/* =========================
-   ADD
-========================= */
+// ----------------- add vehicle -----------------
 const addVehicleData = (id, make, model, year, color, qty, price, desc) => {
     const v = new Vehicle(id, make, model, year, color, qty, price, desc);
     vehicle_db.push(v);
@@ -60,9 +56,7 @@ const addVehicleData = (id, make, model, year, color, qty, price, desc) => {
     return v;
 };
 
-/* =========================
-   UPDATE
-========================= */
+// ----------------- update vehicle -----------------
 const updateVehicleData = (index, id, make, model, year, color, qty, price, desc) => {
     const v = vehicle_db[index];
     if (!v) return null;
@@ -80,24 +74,17 @@ const updateVehicleData = (index, id, make, model, year, color, qty, price, desc
     return v;
 };
 
-/* =========================
-   DELETE
-========================= */
+// ----------------- delete vehicle -----------------
 const deleteVehicleData = (index) => {
     vehicle_db.splice(index, 1);
     syncVehicles();
 };
 
-/* =========================
-   GETTERS
-========================= */
+// ----------------- get vehicles for dropdown -----------------
 const getAllVehicleData = () => vehicle_db;
 const getVehicleDataByIndex = (i) => vehicle_db[i];
 const getVehicleDataById = (id) => vehicle_db.find(v => v.id === id);
 
-/* =========================
-   EXPORT
-========================= */
 export {
     addVehicleData,
     updateVehicleData,
