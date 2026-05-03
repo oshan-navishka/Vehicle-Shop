@@ -526,8 +526,8 @@
       </div>
     </div>
 
-  </div> <!-- end container -->
-</div><!-- end mainApp -->
+  </div> 
+</div>
 
 <!-- TOAST CONTAINER -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100" id="toastContainer">
@@ -565,7 +565,6 @@ function showMsg(msg, type='success') {
 }
 const state = { customers: [], vehicles: [], orders: [] };
 
-// Quick shim to keep the original switchTab working if needed
 function switchTab(tab) {
     if(tab === 'login') {
         document.getElementById('tabLoginBtn').click();

@@ -1,8 +1,5 @@
 import { vehicle_db } from "../db/db.js";
 
-/* =========================
-   VEHICLE CLASS
-========================= */
 class Vehicle {
     #id;
     #make;
