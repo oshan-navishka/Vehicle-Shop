@@ -12,21 +12,21 @@
 <body>
 
 <!-- AUTH SECTION -->
-<div id="authSection" class="bg-primary bg-gradient d-flex align-items-center w-100 min-vh-100">
+<div id="authSection" class="bg-dark bg-gradient d-flex align-items-center w-100 min-vh-100">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-5">
         <div class="card shadow-lg border-0 p-4 rounded-4">
           <div class="text-center mb-4">
             <div class="display-4 mb-2">🚗</div>
-            <h2 class="fw-bold text-primary">Navi-Auto-Drive</h2>
+            <h2 class="fw-bold text-dark">Navi-Auto-Drive</h2>
             <p class="text-muted">Vehicle Shop Management System</p>
           </div>
           
           <!-- Nav Tabs -->
           <ul class="nav nav-pills nav-justified mb-4" id="authTabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active fw-bold" id="tabLoginBtn" data-bs-toggle="pill" data-bs-target="#loginPane" type="button" role="tab" onclick="switchTab('login')">LOGIN</button>
+              <button class="nav-link active fw-bold" id="tabLoginBtn" style="background-color: black; color: white;" data-bs-toggle="pill" data-bs-target="#loginPane" type="button" role="tab" onclick="switchTab('login')">LOGIN</button>
             </li>
             <li class="nav-item" role="presentation">
               <button class="nav-link fw-bold" id="tabRegBtn" data-bs-toggle="pill" data-bs-target="#regPane" type="button" role="tab" onclick="switchTab('reg')">REGISTER</button>
@@ -37,14 +37,14 @@
             <!-- LOGIN -->
             <div class="tab-pane fade show active" id="loginPane" role="tabpanel">
               <div class="mb-3">
-                <label class="form-label fw-bold text-secondary small text-uppercase">Email Address</label>
+                <label class="form-label fw-bold text-dark small text-uppercase">Email Address</label>
                 <input type="email" class="form-control" id="lEmail" placeholder="your@email.com">
               </div>
               <div class="mb-4">
-                <label class="form-label fw-bold text-secondary small text-uppercase">Password</label>
+                <label class="form-label fw-bold text-dark small text-uppercase">Password</label>
                 <input type="password" class="form-control" id="lPass" placeholder="••••••••">
               </div>
-              <button class="btn btn-primary w-100 py-2 fw-bold" onclick="doLogin()">🔑 LOGIN</button>
+              <button class="btn btn-dark w-100 py-2 fw-bold" onclick="doLogin()">🔑 LOGIN</button>
               <div id="lErr" class="alert alert-danger mt-3 py-2 text-center fw-bold hidden"></div>
             </div>
             
@@ -83,7 +83,7 @@
 <div class="d-flex">
 
   <!-- SIDEBAR -->
-  <div class="bg-primary bg-gradient text-white vh-100 p-3 position-fixed shadow" style="width: 250px;">
+  <div class="bg-dark bg-gradient text-white vh-100 p-3 position-fixed shadow" style="width: 250px;">
 
     <!-- BRAND -->
     <div class="d-flex align-items-center gap-2 mb-4">
