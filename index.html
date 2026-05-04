@@ -12,72 +12,61 @@
 <body>
 
 <!-- AUTH SECTION -->
-<div id="authSection" class="bg-dark bg-gradient d-flex align-items-center w-100 min-vh-100">
+<div id="authSection" class="bg-primary bg-gradient d-flex align-items-center w-100 min-vh-100">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-5">
-        <div class="card shadow-lg border-0 p-4 rounded-4 bg-light">
-          <div class="text-center mb-4 bg-gradient">
+        <div class="card shadow-lg border-0 p-4 rounded-4">
+          <div class="text-center mb-4">
             <div class="display-4 mb-2">🚗</div>
-            <h2 class="fw-bold text-dark">Navi-Auto-Drive</h2>
+            <h2 class="fw-bold text-primary">Navi-Auto-Drive</h2>
             <p class="text-muted">Vehicle Shop Management System</p>
           </div>
           
           <!-- Nav Tabs -->
-          <div class="btn-group w-100 mb-4" role="group">
-
-            <button class="btn btn-dark text-white"
-                    id="tabLoginBtn"
-                    data-bs-toggle="pill"
-                    data-bs-target="#loginPane"
-                    onclick="switchTab('login')">
-              LOGIN
-            </button>
-
-            <button class="btn btn-light text-dark"
-                    id="tabRegBtn"
-                    data-bs-toggle="pill"
-                    data-bs-target="#regPane"
-                    onclick="switchTab('reg')">
-              REGISTER
-            </button>
-
-          </div>
-
+          <ul class="nav nav-pills nav-justified mb-4" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold" id="tabLoginBtn" data-bs-toggle="pill" data-bs-target="#loginPane" type="button" role="tab" onclick="switchTab('login')">LOGIN</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold" id="tabRegBtn" data-bs-toggle="pill" data-bs-target="#regPane" type="button" role="tab" onclick="switchTab('reg')">REGISTER</button>
+            </li>
+          </ul>
+          
           <div class="tab-content" id="authTabContent">
             <!-- LOGIN -->
             <div class="tab-pane fade show active" id="loginPane" role="tabpanel">
               <div class="mb-3">
-                <label class="form-label fw-bold text-dark small text-uppercase">Email Address</label>
+                <label class="form-label fw-bold text-secondary small text-uppercase">Email Address</label>
                 <input type="email" class="form-control" id="lEmail" placeholder="your@email.com">
               </div>
               <div class="mb-4">
-                <label class="form-label fw-bold text-dark small text-uppercase">Password</label>
+                <label class="form-label fw-bold text-secondary small text-uppercase">Password</label>
                 <input type="password" class="form-control" id="lPass" placeholder="••••••••">
               </div>
-              <button class="btn btn-dark w-100 py-2 fw-bold" onclick="doLogin()">🔑 LOGIN</button>
+              <button class="btn btn-primary w-100 py-2 fw-bold" onclick="doLogin()">🔑 LOGIN</button>
               <div id="lErr" class="alert alert-danger mt-3 py-2 text-center fw-bold hidden"></div>
             </div>
             
             <!-- REGISTER -->
             <div class="tab-pane fade" id="regPane" role="tabpanel">
               <div class="mb-3">
-                <label class="form-label fw-bold text-dark small text-uppercase">Full Name</label>
+                <label class="form-label fw-bold text-secondary small text-uppercase">Full Name</label>
                 <input type="text" class="form-control" id="rUser" placeholder="Oshan Navishka">
               </div>
               <div class="mb-3">
-                <label class="form-label fw-bold text-dark small text-uppercase">Email Address</label>
+                <label class="form-label fw-bold text-secondary small text-uppercase">Email Address</label>
                 <input type="email" class="form-control" id="rEmail" placeholder="your@email.com">
               </div>
               <div class="mb-3">
-                <label class="form-label fw-bold text-dark small text-uppercase">Password</label>
+                <label class="form-label fw-bold text-secondary small text-uppercase">Password</label>
                 <input type="password" class="form-control" id="rPass" placeholder="••••••••">
               </div>
               <div class="mb-4">
-                <label class="form-label fw-bold text-dark small text-uppercase">Confirm Password</label>
+                <label class="form-label fw-bold text-secondary small text-uppercase">Confirm Password</label>
                 <input type="password" class="form-control" id="rPass2" placeholder="••••••••">
               </div>
-              <button class="btn btn-dark w-100 py-2 fw-bold" onclick="doRegister()">✅ CREATE ACCOUNT</button>
+              <button class="btn btn-primary w-100 py-2 fw-bold" onclick="doRegister()">✅ CREATE ACCOUNT</button>
               <div id="rErr" class="alert alert-danger mt-3 py-2 text-center fw-bold hidden"></div>
             </div>
           </div>
@@ -94,7 +83,7 @@
 <div class="d-flex">
 
   <!-- SIDEBAR -->
-  <div class="bg-dark bg-gradient text-white vh-100 p-3 position-fixed shadow" style="width: 250px;">
+  <div class="bg-primary bg-gradient text-white vh-100 p-3 position-fixed shadow" style="width: 250px;">
 
     <!-- BRAND -->
     <div class="d-flex align-items-center gap-2 mb-4">
@@ -147,13 +136,13 @@
   <!-- MAIN CONTENT -->
   <div class="flex-grow-1" style="margin-left:250px;">
 
-    <div class="container-fluid py-3 px-3 bg-secondary">
+    <div class="container-fluid py-3 px-3">
 
   <div class="container-fluid py-4 px-lg-4">
     
     <!-- DASHBOARD -->
     <div id="s_dash">
-      <div class="card bg-dark bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
+      <div class="card bg-primary bg-gradient text-white border-0 p-4 mb-4 shadow-sm rounded-4">
         <div class="d-flex align-items-center gap-3">
           <span class="display-5">📊</span>
           <div>

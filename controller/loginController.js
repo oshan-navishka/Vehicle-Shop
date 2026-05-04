@@ -41,24 +41,8 @@ function showAuth() {
 
 /* ------------------ TAB SWITCH ------------------ */
 function switchTab(t) {
-
-    const loginBtn = document.getElementById('tabLoginBtn');
-    const regBtn = document.getElementById('tabRegBtn');
-
-    if (t === 'login') {
-        loginBtn.classList.remove('btn-light', 'text-dark');
-        loginBtn.classList.add('btn-dark', 'text-white');
-
-        regBtn.classList.remove('btn-dark', 'text-white');
-        regBtn.classList.add('btn-light', 'text-dark');
-
-    } else {
-        regBtn.classList.remove('btn-light', 'text-dark');
-        regBtn.classList.add('btn-dark', 'text-white');
-
-        loginBtn.classList.remove('btn-dark', 'text-white');
-        loginBtn.classList.add('btn-light', 'text-dark');
-    }
+    document.getElementById('tabLoginBtn').classList.toggle('active', t === 'login');
+    document.getElementById('tabRegBtn').classList.toggle('active', t === 'reg');
 
     document.getElementById('loginPane').classList.toggle('show', t === 'login');
     document.getElementById('loginPane').classList.toggle('active', t === 'login');
