@@ -97,7 +97,13 @@ function doRegister() {
 
     addLoginData(uid('U'), name, email, pass);
 
-    showMsg('Registration successful! Please login.', 'success');
+    Swal.fire({
+        title: 'Success!',
+        text: 'Registration successful. Please login.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#198754'
+    });
 
     // clear fields
     document.getElementById('rUser').value = '';
@@ -117,6 +123,7 @@ function doLogout() {
 
     switchTab('login');
 }
+
 
 /* ------------------ EXPORT GLOBAL ------------------ */
 window.switchTab  = switchTab;
