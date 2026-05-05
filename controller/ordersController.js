@@ -10,17 +10,14 @@ let currentOrderItems = [];
 function generateOrderId() {
     if (!order_db.length) return "ORD3001";
 
-    // last order eka ganna
     const last = order_db[order_db.length - 1].orderId;
 
-    // number eka extract karanna
     const num = parseInt(last.replace("ORD", ""));
 
     // next id
     return "ORD" + (num + 1);
 }
 
-// helper
 const el = (id) => document.getElementById(id);
 
 // ---------------- INIT ----------------
@@ -174,7 +171,7 @@ function placeOrder() {
         bal
     );
 
-    // reduce stock
+    // update stock
     currentOrderItems.forEach(i => {
         const v = vehicle_db.find(x => x.id === i.id);
         if (v) v.qty -= i.qty;

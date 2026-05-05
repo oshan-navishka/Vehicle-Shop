@@ -9,9 +9,7 @@ import {
 
 let selected_index = -1;
 
-/* =========================
-   CLEAR FORM
-========================= */
+// ------------------- CLEAR FORM -------------------
 const clearForm = () => {
     $('#vId').val('');
     $('#vMake').val('');
@@ -24,9 +22,7 @@ const clearForm = () => {
     selected_index = -1;
 };
 
-/* =========================
-   RENDER TABLE
-========================= */
+// ------------------- RENDER TABLE -------------------
 window.renderVehicles = function () {
 
     const tbl = $('#vehTbl');
@@ -60,9 +56,7 @@ window.renderVehicles = function () {
     });
 };
 
-/* =========================
-   ROW SELECT
-========================= */
+// ------------------- SELECT ROW -------------------
 $('#vehTbl').on('click', 'tr', function () {
 
     const index = $(this).data('index');
@@ -84,9 +78,7 @@ $('#vehTbl').on('click', 'tr', function () {
     $(this).addClass('table-active');
 });
 
-/* =========================
-   SAVE
-========================= */
+// ------------------- SAVE -------------------
 window.saveVeh = function () {
 
     let id = $('#vId').val().trim();
@@ -124,9 +116,7 @@ window.saveVeh = function () {
     Swal.fire('Success', 'Vehicle Saved!', 'success');
 };
 
-/* =========================
-   UPDATE
-========================= */
+//------------------- Update -------------------
 window.updateVeh = function () {
 
     if (selected_index === -1) {
@@ -160,9 +150,7 @@ window.updateVeh = function () {
     Swal.fire('Success', 'Vehicle Updated!', 'success');
 };
 
-/* =========================
-   DELETE
-========================= */
+//------------------- Delete -------------------
 window.deleteVeh = function () {
 
     if (selected_index === -1) {
@@ -178,12 +166,6 @@ window.deleteVeh = function () {
     Swal.fire('Success', 'Vehicle Deleted!', 'success');
 };
 
-/* =========================
-   EXPORT CLEAR
-========================= */
 window.clearVeh = clearForm;
 
-/* =========================
-   INIT
-========================= */
 renderVehicles();

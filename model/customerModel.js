@@ -1,6 +1,5 @@
 import { customer_db } from "../db/db.js";
 
-// ---------------- CLASS ----------------
 class Customer {
     #id;
     #firstName;

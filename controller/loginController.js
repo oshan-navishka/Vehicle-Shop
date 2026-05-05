@@ -1,5 +1,3 @@
-// controller/loginController.js
-
 import { users_db } from '../db/db.js';
 
 /* ------------------ UTIL ------------------ */
@@ -31,7 +29,7 @@ function showApp() {
     document.getElementById('authSection').classList.add('d-none');
     document.getElementById('mainApp').classList.remove('d-none');
 
-    nav('dash'); // from navigationController.js
+    nav('dash'); 
 }
 
 function showAuth() {
