@@ -76,7 +76,11 @@ function addToOrder() {
     const already = existing ? existing.qty : 0;
 
     if (already + qty > v.qty) {
-        showMsg("Not enough stock!", "error");
+        Swal.fire({
+            icon: 'error',
+            title: 'Stock Error',
+            text: 'Not enough stock!'
+        });
         return;
     }
 
@@ -143,7 +147,11 @@ function calcBalance() {
 // ---------------- PLACE ORDER ----------------
 function placeOrder() {
     if (!el('oCust').value || currentOrderItems.length === 0) {
-        showMsg("Select customer & items", "error");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Missing Data',
+            text: 'Please select customer and add items'
+        });
         return;
     }
 
@@ -154,7 +162,7 @@ function placeOrder() {
     const net = total - (total * disc / 100);
     const bal = cash - net;
 
-    const order = addOrderData(
+    addOrderData(
         el('oId').value,
         el('oDate').value,
         el('oCust').value,
@@ -172,17 +180,21 @@ function placeOrder() {
         if (v) v.qty -= i.qty;
     });
 
-    // SAVE TO STORAGE (IMPORTANT FIX)
     localStorage.setItem("pos_orders", JSON.stringify(order_db));
 
-    showMsg("Order placed!");
+    Swal.fire({
+        icon: 'success',
+        title: 'Order Placed Successfully!',
+        timer: 1200,
+        showConfirmButton: false
+    }).then(() => {
+        currentOrderItems = [];
+        renderOrderItems();
+        initOrder();
 
-    currentOrderItems = [];
-    renderOrderItems();
-    initOrder();
-
-    window.renderHist();
-    window.updateDash();
+        window.renderHist();
+        window.updateDash();
+    });
 }
 
 // ---------------- HISTORY ----------------
